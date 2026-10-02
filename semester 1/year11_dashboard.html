@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Year 11 Dashboard • 2026/27</title>
+<style>
+  :root{
+    --bg:#0b1020;
+    --panel:#121a31;
+    --panel2:#18233f;
+    --text:#f7f9ff;
+    --muted:#aeb9d6;
+    --accent:#7c5cff;
+    --accent2:#00d4ff;
+    --danger:#ff4d6d;
+    --warning:#ffb000;
+    --success:#25d695;
+    --pink:#ff6bd6;
+    --line:rgba(255,255,255,.10);
+    --shadow:0 18px 50px rgba(0,0,0,.30);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    background:
+      radial-gradient(circle at 15% 10%, rgba(124,92,255,.22), transparent 28%),
+      radial-gradient(circle at 85% 0%, rgba(0,212,255,.16), transparent 25%),
+      var(--bg);
+    color:var(--text);
+    min-height:100vh;
+  }
+  .wrap{max-width:1450px;margin:0 auto;padding:26px}
+  .topbar{
+    display:grid;grid-template-columns:1.6fr 1fr;gap:18px;align-items:stretch;
+    margin-bottom:18px;
+  }
+  .hero,.stats,.controls,.panel{
+    background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.018));
+    border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);
+    backdrop-filter:blur(16px);
+  }
+  .hero{padding:26px;position:relative;overflow:hidden}
+  .hero:after{
+    content:"";position:absolute;right:-60px;top:-80px;width:260px;height:260px;
+    border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));
+    filter:blur(14px);opacity:.13;
+  }
+  .eyebrow{font-size:.78rem;text-transform:uppercase;letter-spacing:.18em;color:var(--accent2);font-weight:900}
+  h1{margin:8px 0 8px;font-size:clamp(2rem,5vw,4.3rem);line-height:.95;letter-spacing:-.05em}
+  .hero p{margin:0;color:var(--muted);font-size:1rem;max-width:780px}
+  .stats{padding:18px;display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  .stat{background:rgba(255,255,255,.04);padding:16px;border-radius:18px;border:1px solid var(--line)}
+  .stat .num{font-size:2rem;font-weight:950}
+  .stat .label{font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;font-weight:800}
+  .controls{padding:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
+  button,.chip,select,input{
+    border:1px solid var(--line);background:#11182c;color:var(--text);border-radius:14px;
+    padding:10px 13px;font-weight:800;font:inherit;
+  }
+  button{cursor:pointer;transition:.2s ease}
+  button:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.28)}
+  button.active{background:linear-gradient(135deg,var(--accent),#5f7dff);border-color:transparent}
+  input{min-width:220px;flex:1}
+  select{cursor:pointer}
+  .spacer{flex:1}
+  .dashboard{display:grid;grid-template-columns:minmax(0,2.1fr) minmax(300px,.9fr);gap:18px}
+  .panel{padding:18px}
+  .panel h2{margin:0 0 14px;font-size:1.15rem}
+  .next-card{
+    background:linear-gradient(135deg,rgba(124,92,255,.24),rgba(0,212,255,.12));
+    border:1px solid rgba(124,92,255,.35);padding:18px;border-radius:20px;margin-bottom:14px
+  }
+  .next-card .date{font-weight:950;font-size:1.05rem}
+  .next-card .title{font-size:1.45rem;font-weight:950;margin-top:5px}
+  .countdown{font-weight:900;color:var(--accent2);margin-top:6px}
+  .timeline{display:flex;flex-direction:column;gap:10px}
+  .event{
+    display:grid;grid-template-columns:105px 1fr auto;gap:14px;align-items:center;
+    padding:14px;border-radius:18px;background:rgba(255,255,255,.035);border:1px solid var(--line);
+  }
+  .event.past{opacity:.48}
+  .datebox{font-weight:950;line-height:1.05}
+  .datebox small{display:block;color:var(--muted);font-weight:800;margin-top:4px}
+  .event-title{font-weight:900}
+  .event-meta{color:var(--muted);font-size:.87rem;margin-top:4px}
+  .badge{padding:6px 9px;border-radius:999px;font-size:.72rem;font-weight:950;white-space:nowrap}
+  .exam{background:rgba(255,77,109,.18);color:#ff8aa0}
+  .sixth{background:rgba(124,92,255,.22);color:#b4a6ff}
+  .school{background:rgba(0,212,255,.16);color:#7de9ff}
+  .practical{background:rgba(255,176,0,.17);color:#ffd166}
+  .milestone{background:rgba(37,214,149,.17);color:#72efbd}
+  .calendar-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}
+  .dow{padding:8px 4px;text-align:center;color:var(--muted);font-size:.72rem;font-weight:900;text-transform:uppercase}
+  .day{
+    min-height:108px;border:1px solid var(--line);border-radius:14px;padding:7px;background:rgba(255,255,255,.025);
+    overflow:hidden
+  }
+  .day.muted{opacity:.25}
+  .day.today{outline:2px solid var(--accent2)}
+  .daynum{font-size:.8rem;font-weight:950;margin-bottom:5px}
+  .mini{
+    display:block;padding:4px 5px;border-radius:7px;margin:3px 0;font-size:.66rem;line-height:1.15;
+    font-weight:900;background:rgba(124,92,255,.20);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
+  .mini.exam{background:rgba(255,77,109,.20)}
+  .mini.practical{background:rgba(255,176,0,.20)}
+  .mini.school{background:rgba(0,212,255,.18)}
+  .mini.milestone{background:rgba(37,214,149,.18)}
+  .side-list{display:flex;flex-direction:column;gap:10px}
+  .side-item{padding:12px 13px;border-radius:15px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
+  .side-item strong{display:block}
+  .side-item span{color:var(--muted);font-size:.84rem}
+  .legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .warn{
+    margin-top:14px;padding:13px;border-radius:15px;background:rgba(255,176,0,.09);
+    border:1px solid rgba(255,176,0,.28);font-size:.86rem;color:#ffe3a3
+  }
+  .hidden{display:none!important}
+  .week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:9px}
+  .week-col{min-height:250px;border:1px solid var(--line);border-radius:16px;padding:10px;background:rgba(255,255,255,.025)}
+  .week-col h3{margin:0 0 8px;font-size:.8rem;color:var(--muted)}
+  .week-card{padding:8px;border-radius:11px;background:rgba(124,92,255,.18);font-size:.78rem;font-weight:850;margin-bottom:7px}
+  .week-card.exam{background:rgba(255,77,109,.18)}
+  .week-card.practical{background:rgba(255,176,0,.18)}
+  .week-card.school{background:rgba(0,212,255,.16)}
+  .week-card.milestone{background:rgba(37,214,149,.16)}
+  @media(max-width:980px){
+    .topbar,.dashboard{grid-template-columns:1fr}
+    .week-grid{grid-template-columns:1fr 1fr}
+    .event{grid-template-columns:80px 1fr}
+    .event .badge{grid-column:2}
+  }
+  @media(max-width:600px){
+    .wrap{padding:14px}
+    .stats{grid-template-columns:1fr 1fr}
+    .cal-grid{gap:3px}
+    .day{min-height:72px;padding:4px}
+    .mini{font-size:.58rem}
+    .week-grid{grid-template-columns:1fr}
+    h1{font-size:2.4rem}
+  }
+  @media print{
+    body{background:#fff;color:#111}
+    .controls,.warn{display:none!important}
+    .hero,.stats,.panel{box-shadow:none;background:#fff;border:1px solid #ccc}
+    .dashboard{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="topbar">
+    <div class="hero">
+      <div class="eyebrow">Trinity Church of England High School</div>
+      <h1>YEAR 11<br>2026/27</h1>
+      <p>A visual dashboard for exams, sixth-form deadlines, practicals and key school milestones. Use month, week or agenda view so nothing important gets buried.</p>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="num" id="upcomingCount">0</div><div class="label">Upcoming events</div></div>
+      <div class="stat"><div class="num" id="nextDays">—</div><div class="label">Days to next event</div></div>
+      <div class="stat"><div class="num" id="examCount">0</div><div class="label">Exam-related</div></div>
+      <div class="stat"><div class="num" id="thisMonthCount">0</div><div class="label">This month</div></div>
+    </div>
+  </section>
+
+  <section class="controls">
+    <button class="viewbtn active" data-view="agenda">Agenda</button>
+    <button class="viewbtn" data-view="month">Month</button>
+    <button class="viewbtn" data-view="week">Week</button>
+    <select id="categoryFilter">
+      <option value="all">All categories</option>
+      <option value="exam">Exams</option>
+      <option value="sixth">Sixth Form</option>
+      <option value="practical">Practicals</option>
+      <option value="school">School events</option>
+      <option value="milestone">Milestones</option>
+    </select>
+    <input id="search" placeholder="Search events…" />
+    <div class="spacer"></div>
+    <button id="todayBtn">Today</button>
+    <button id="printBtn">Print</button>
+  </section>
+
+  <div class="dashboard">
+    <main class="panel">
+      <div id="agendaView">
+        <h2>Upcoming & important</h2>
+        <div id="nextCard" class="next-card"></div>
+        <div id="timeline" class="timeline"></div>
+      </div>
+
+      <div id="monthView" class="hidden">
+        <div class="calendar-head">
+          <button id="prevMonth">←</button>
+          <h2 id="monthLabel" style="margin:0"></h2>
+          <button id="nextMonth">→</button>
+        </div>
+        <div class="cal-grid" id="calendar"></div>
+      </div>
+
+      <div id="weekView" class="hidden">
+        <div class="calendar-head">
+          <button id="prevWeek">←</button>
+          <h2 id="weekLabel" style="margin:0"></h2>
+          <button id="nextWeek">→</button>
+        </div>
+        <div class="week-grid" id="weekGrid"></div>
+      </div>
+    </main>
+
+    <aside class="panel">
+      <h2>Focus panel</h2>
+      <div id="focusList" class="side-list"></div>
+      <div class="legend">
+        <span class="badge exam">Exam</span>
+        <span class="badge sixth">Sixth Form</span>
+        <span class="badge practical">Practical</span>
+        <span class="badge school">School</span>
+        <span class="badge milestone">Milestone</span>
+      </div>
+      <div class="warn">
+        <strong>Source note:</strong> the October Maths calculator labels conflict between the letter and the milestone sheet.
+        This dashboard follows the milestone sheet: 6 Oct = non-calculator, 8 Oct = calculator. Please verify with school if needed.
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+const events = [
+  {date:"2026-09-10", time:"18:30", title:"Y11 Scene Setting — Exam Support & Next Steps", cat:"school"},
+  {date:"2026-09-22", title:"Y11 Sixth Form talk (P1 & P2)", cat:"sixth"},
+  {date:"2026-09-24", time:"18:00", title:"Trinity Sixth Form open evening", cat:"sixth"},
+  {date:"2026-10-05", title:"Sixth Form entrance exams — Maths & English week", cat:"sixth"},
+  {date:"2026-10-06", time:"09:00", title:"Maths Paper 1 — Non-calculator", cat:"exam"},
+  {date:"2026-10-07", time:"09:00", title:"English Literature Paper 2", cat:"exam"},
+  {date:"2026-10-08", time:"09:00", title:"Maths Paper 2 — Calculator", cat:"exam"},
+
+  {date:"2026-11-03", time:"09:00", title:"RE Paper 1", cat:"exam"},
+  {date:"2026-11-03", time:"13:00", title:"Geography", cat:"exam"},
+  {date:"2026-11-03", title:"Year 11 Sixth Form entrance exams begin (9 school days)", cat:"sixth"},
+  {date:"2026-11-04", time:"09:00", title:"Science / Biology", cat:"exam"},
+  {date:"2026-11-04", time:"13:00", title:"GCSE PE", cat:"exam"},
+  {date:"2026-11-04", time:"13:00", title:"Food & Nutrition", cat:"exam"},
+  {date:"2026-11-05", time:"09:00", title:"Business Studies", cat:"exam"},
+  {date:"2026-11-05", time:"11:30", title:"French & Spanish listening and reading", cat:"exam"},
+  {date:"2026-11-06", title:"PE Mock practical exam", cat:"practical"},
+  {date:"2026-11-09", title:"PE Mock practical exam", cat:"practical"},
+  {date:"2026-11-10", time:"09:00", title:"Science / Chemistry", cat:"exam"},
+  {date:"2026-11-11", time:"09:00", title:"English Language Paper 1", cat:"exam"},
+  {date:"2026-11-12", time:"11:00", title:"French & Spanish writing", cat:"exam"},
+  {date:"2026-11-12", title:"Science / Physics (in lessons)", cat:"exam"},
+  {date:"2026-11-13", time:"09:00", title:"History", cat:"exam"},
+  {date:"2026-11-13", time:"13:00", title:"Computer Science", cat:"exam"},
+  {date:"2026-11-13", time:"13:00", title:"GCSE Music", cat:"exam"},
+  {date:"2026-11-16", title:"Year 11 MFL Mock Speaking Exams begin (8 school days)", cat:"exam"},
+  {date:"2026-11-19", title:"Year 11 Component 2 acting practical exam — 11B", cat:"practical"},
+  {date:"2026-11-20", title:"Year 11 Component 2 acting practical exam — 11C", cat:"practical"},
+  {date:"2026-12-02", title:"BTEC Music Y11 Component 2 recording day", cat:"practical"},
+  {date:"2026-12-03", title:"Y11 Sixth Form entrance exam results day", cat:"sixth"},
+  {date:"2026-12-03", title:"Y11 Parents Consultation", cat:"school"},
+
+  {date:"2027-01-12", title:"Y11 Mock Interviews", cat:"school"},
+  {date:"2027-02-01", title:"Provisional Food & Nutrition practical", cat:"practical"},
+  {date:"2027-02-02", title:"Provisional Food & Nutrition practical", cat:"practical"},
+  {date:"2027-02-09", title:"Provisional Food & Nutrition practical", cat:"practical"},
+  {date:"2027-02-10", title:"Y11 Profile reports issued", cat:"milestone"},
+  {date:"2027-02-10", title:"Provisional Food & Nutrition practical", cat:"practical"},
+  {date:"2027-02-22", title:"Sixth Form entrance exam week 2 begins", cat:"sixth"},
+  {date:"2027-02-23", time:"09:00", title:"Provisional Maths Paper 1 — Sixth Form entrance exam 2", cat:"exam"},
+  {date:"2027-02-24", time:"09:00", title:"Provisional Maths Paper 2 — Sixth Form entrance exam 2", cat:"exam"},
+  {date:"2027-02-25", time:"09:00", title:"Provisional English Literature Paper 1 — Sixth Form entrance exam 2", cat:"exam"},
+  {date:"2027-02-26", time:"09:00", title:"Provisional Maths Paper 3 — Sixth Form entrance exam 2", cat:"exam"},
+  {date:"2027-03-01", time:"09:00", title:"Provisional English Language Paper 2 — Sixth Form entrance exam 2", cat:"exam"},
+  {date:"2027-03-02", title:"Y11 MFL Speaking Mock exams begin (8 school days)", cat:"exam"},
+  {date:"2027-03-09", title:"Y11 Art Examination", cat:"exam"},
+  {date:"2027-03-11", title:"Y11 Art Examination", cat:"exam"},
+  {date:"2027-03-18", title:"Y11 Art Examination", cat:"exam"},
+  {date:"2027-03-19", time:"08:30", title:"Y11 Photos — including whole year group photo", cat:"school"},
+  {date:"2027-03-24", title:"Y11 Component 3 Performing Arts practical exam — 11C", cat:"practical"},
+  {date:"2027-03-25", title:"Y11 Component 3 Performing Arts practical exam — 11B", cat:"practical"},
+
+  {date:"2027-04-26", title:"Y11 MFL GCSE Speaking Exams begin (10 school days)", cat:"exam"},
+  {date:"2027-04-28", title:"BTEC Music Y11 Component 3 recording day", cat:"practical"},
+  {date:"2027-05-04", title:"Start of Y11 GCSE Examinations", cat:"exam"},
+  {date:"2027-05-21", title:"Y11 shirt signing day", cat:"milestone"},
+  {date:"2027-06-23", title:"Y11 Prom", cat:"milestone"},
+  {date:"2027-06-24", time:"14:30", title:"Y11 Celebration Assembly", cat:"milestone"}
+].sort((a,b)=>new Date(a.date+"T"+(a.time||"00:00"))-new Date(b.date+"T"+(b.time||"00:00")));
+
+const catNames={exam:"Exam",sixth:"Sixth Form",practical:"Practical",school:"School",milestone:"Milestone"};
+const $=s=>document.querySelector(s);
+const $$=s=>[...document.querySelectorAll(s)];
+
+let today=new Date(); today.setHours(0,0,0,0);
+let currentMonth=new Date(today.getFullYear(),today.getMonth(),1);
+let currentWeek=startOfWeek(today);
+
+function startOfWeek(d){
+  const x=new Date(d); const day=(x.getDay()+6)%7; x.setDate(x.getDate()-day); x.setHours(0,0,0,0); return x;
+}
+function fmtDate(s,opt={day:"numeric",month:"short",year:"numeric"}){
+  return new Date(s+"T12:00:00").toLocaleDateString("en-GB",opt);
+}
+function daysBetween(a,b){ return Math.round((b-a)/86400000); }
+function filteredEvents(){
+  const c=$("#categoryFilter").value, q=$("#search").value.trim().toLowerCase();
+  return events.filter(e=>(c==="all"||e.cat===c) && (!q||(`${e.title} ${e.time||""} ${catNames[e.cat]}`).toLowerCase().includes(q)));
+}
+function renderStats(){
+  const up=events.filter(e=>new Date(e.date+"T23:59:59")>=today);
+  $("#upcomingCount").textContent=up.length;
+  $("#examCount").textContent=events.filter(e=>e.cat==="exam"&&new Date(e.date+"T23:59:59")>=today).length;
+  const next=up[0];
+  $("#nextDays").textContent=next?daysBetween(today,new Date(next.date+"T12:00:00")):"—";
+  $("#thisMonthCount").textContent=events.filter(e=>{
+    let d=new Date(e.date+"T12:00:00"); return d.getFullYear()===today.getFullYear()&&d.getMonth()===today.getMonth()
+  }).length;
+}
+function renderAgenda(){
+  const list=filteredEvents();
+  const future=list.filter(e=>new Date(e.date+"T23:59:59")>=today);
+  const next=future[0];
+  $("#nextCard").innerHTML=next?`
+    <div class="eyebrow">Next important date</div>
+    <div class="date">${fmtDate(next.date,{weekday:"long",day:"numeric",month:"long"})}${next.time?` • ${next.time}`:""}</div>
+    <div class="title">${next.title}</div>
+    <div class="countdown">${daysBetween(today,new Date(next.date+"T12:00:00"))===0?"Today":daysBetween(today,new Date(next.date+"T12:00:00"))+" days away"}</div>
+  `:`<strong>No upcoming events match your filters.</strong>`;
+
+  $("#timeline").innerHTML=list.map(e=>{
+    const d=new Date(e.date+"T12:00:00"), past=d<today;
+    return `<div class="event ${past?"past":""}">
+      <div class="datebox">${d.toLocaleDateString("en-GB",{day:"2-digit",month:"short"})}<small>${d.toLocaleDateString("en-GB",{weekday:"short"})}</small></div>
+      <div><div class="event-title">${e.title}</div><div class="event-meta">${e.time?e.time+" • ":""}${fmtDate(e.date,{year:"numeric",month:"long",day:"numeric"})}</div></div>
+      <span class="badge ${e.cat}">${catNames[e.cat]}</span>
+    </div>`;
+  }).join("");
+}
+function renderMonth(){
+  const y=currentMonth.getFullYear(),m=currentMonth.getMonth();
+  $("#monthLabel").textContent=currentMonth.toLocaleDateString("en-GB",{month:"long",year:"numeric"});
+  const first=new Date(y,m,1), start=new Date(first);
+  start.setDate(1-((first.getDay()+6)%7));
+  const data=filteredEvents();
+  let html=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map(d=>`<div class="dow">${d}</div>`).join("");
+  for(let i=0;i<42;i++){
+    const d=new Date(start); d.setDate(start.getDate()+i);
+    const key=d.toISOString().slice(0,10), inMonth=d.getMonth()===m, isToday=d.getTime()===today.getTime();
+    const evs=data.filter(e=>e.date===key);
+    html+=`<div class="day ${inMonth?"":"muted"} ${isToday?"today":""}">
+      <div class="daynum">${d.getDate()}</div>
+      ${evs.slice(0,4).map(e=>`<span class="mini ${e.cat}" title="${e.title}">${e.time?e.time+" ":""}${e.title}</span>`).join("")}
+      ${evs.length>4?`<span class="mini">+${evs.length-4} more</span>`:""}
+    </div>`;
+  }
+  $("#calendar").innerHTML=html;
+}
+function renderWeek(){
+  const end=new Date(currentWeek); end.setDate(end.getDate()+6);
+  $("#weekLabel").textContent=`${fmtDate(currentWeek.toISOString().slice(0,10),{day:"numeric",month:"short"})} – ${fmtDate(end.toISOString().slice(0,10),{day:"numeric",month:"short",year:"numeric"})}`;
+  const data=filteredEvents();
+  let html="";
+  for(let i=0;i<7;i++){
+    const d=new Date(currentWeek); d.setDate(currentWeek.getDate()+i);
+    const key=d.toISOString().slice(0,10), evs=data.filter(e=>e.date===key);
+    html+=`<div class="week-col"><h3>${d.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"})}</h3>
+      ${evs.length?evs.map(e=>`<div class="week-card ${e.cat}">${e.time?`<b>${e.time}</b><br>`:""}${e.title}</div>`).join(""):`<div style="color:var(--muted);font-size:.8rem">No events</div>`}
+    </div>`;
+  }
+  $("#weekGrid").innerHTML=html;
+}
+function renderFocus(){
+  const up=events.filter(e=>new Date(e.date+"T23:59:59")>=today).slice(0,6);
+  $("#focusList").innerHTML=up.map(e=>`<div class="side-item"><strong>${fmtDate(e.date,{weekday:"short",day:"numeric",month:"short"})}${e.time?` • ${e.time}`:""}</strong><span>${e.title}</span></div>`).join("");
+}
+function renderAll(){renderStats();renderAgenda();renderMonth();renderWeek();renderFocus();}
+function setView(v){
+  ["agenda","month","week"].forEach(x=>$("#"+x+"View").classList.toggle("hidden",x!==v));
+  $$(".viewbtn").forEach(b=>b.classList.toggle("active",b.dataset.view===v));
+}
+$$(".viewbtn").forEach(b=>b.onclick=()=>setView(b.dataset.view));
+$("#categoryFilter").onchange=renderAll;
+$("#search").oninput=renderAll;
+$("#prevMonth").onclick=()=>{currentMonth=new Date(currentMonth.getFullYear(),currentMonth.getMonth()-1,1);renderMonth()};
+$("#nextMonth").onclick=()=>{currentMonth=new Date(currentMonth.getFullYear(),currentMonth.getMonth()+1,1);renderMonth()};
+$("#prevWeek").onclick=()=>{currentWeek.setDate(currentWeek.getDate()-7);renderWeek()};
+$("#nextWeek").onclick=()=>{currentWeek.setDate(currentWeek.getDate()+7);renderWeek()};
+$("#todayBtn").onclick=()=>{currentMonth=new Date(today.getFullYear(),today.getMonth(),1);currentWeek=startOfWeek(today);renderAll()};
+$("#printBtn").onclick=()=>window.print();
+renderAll();
+</script>
+</body>
+</html>

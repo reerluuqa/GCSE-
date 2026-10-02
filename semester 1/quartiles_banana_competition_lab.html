@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quartiles: The Banana Competition Lab</title>
+  <style>
+    :root{
+      --bg:#f7f8fb; --card:#ffffff; --panel:#f1f4f8; --text:#172033; --muted:#5f6b7a;
+      --border:#d8dee8; --accent:#315fe8; --accent-bg:#eaf0ff;
+      --s2:#6f9ceb; --s3:#67b58d; --s4:#d4a552; --s5:#d87373;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;line-height:1.5}
+    button,input{font:inherit}
+    button{cursor:pointer}
+    .app{max-width:980px;margin:0 auto;padding:20px}
+    .hero{margin-bottom:18px}
+    .hero h1{font-size:clamp(1.7rem,4vw,2.5rem);line-height:1.1;margin:.25rem 0 .5rem}
+    .hero p{margin:0;color:var(--muted)}
+    .tabs{display:flex;gap:.5rem;flex-wrap:wrap;margin:1rem 0}
+    .tab{min-height:44px;padding:.55rem .85rem;border:1px solid var(--border);border-radius:.75rem;background:var(--card);font-weight:700;color:var(--text)}
+    .tab[aria-selected="true"]{border-color:var(--accent);background:var(--accent-bg)}
+    .panel{display:none}
+    .panel.active{display:block}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:1rem;padding:1rem}
+    .soft{background:var(--panel);border:1px solid var(--border);border-radius:1rem;padding:1rem}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem}
+    .metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.55rem}
+    .metric{border:1px solid var(--border);border-radius:.8rem;padding:.7rem;min-width:0;background:var(--card)}
+    .big{font-size:1.35rem;font-weight:800;line-height:1.15}
+    .muted{color:var(--muted)}
+    .small{font-size:.9rem}
+    .tiny{font-size:.82rem}
+    .bold{font-weight:800}
+    .mt1{margin-top:.35rem}.mt2{margin-top:.6rem}.mt3{margin-top:.85rem}.mt4{margin-top:1.15rem}.mt5{margin-top:1.5rem}
+    .space > * + *{margin-top:.55rem}
+    .pill{display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:.35rem .65rem;border:1px solid var(--border);border-radius:999px;font-weight:700}
+    .data{display:flex;flex-wrap:wrap;gap:.38rem;margin-top:.7rem}
+    .data span{min-width:2.35rem;text-align:center;padding:.38rem .45rem;border-radius:.65rem;border:1px solid var(--border);font-variant-numeric:tabular-nums}
+    .g1{background:color-mix(in srgb,var(--s2) 18%,white)}
+    .g2{background:color-mix(in srgb,var(--s3) 18%,white)}
+    .g3{background:color-mix(in srgb,var(--s4) 18%,white)}
+    .g4{background:color-mix(in srgb,var(--s5) 18%,white)}
+    .ruler{display:grid;grid-template-columns:repeat(4,1fr);margin:1rem 0 .5rem;border-radius:.8rem;overflow:hidden;border:1px solid var(--border)}
+    .quarter{padding:.85rem .35rem;text-align:center;min-width:0;font-size:.9rem;font-weight:700}
+    .quarter:nth-child(1){background:#eaf1fd}.quarter:nth-child(2){background:#eaf7f0}.quarter:nth-child(3){background:#fff5df}.quarter:nth-child(4){background:#fdecec}
+    .gates{display:grid;grid-template-columns:repeat(4,1fr);text-align:center;font-size:.86rem;font-weight:800}
+    .gates span:nth-child(1){grid-column:1/3}
+    .gates span:nth-child(2){grid-column:2/4}
+    .gates span:nth-child(3){grid-column:3/5}
+    .mis{width:100%;text-align:left;min-height:52px;padding:.8rem;border:1px solid var(--border);border-radius:.8rem;background:var(--card);font-weight:700;color:var(--text)}
+    .answer{display:none;margin-top:.45rem;padding:.7rem;border-left:3px solid var(--accent);background:var(--panel);border-radius:.4rem}
+    .answer.open{display:block}
+    label{display:block;font-weight:700}
+    input[type="number"]{width:100%;min-height:44px;border:1px solid var(--border);border-radius:.7rem;padding:.55rem .65rem;background:white;color:inherit;font-size:16px;margin-top:.3rem}
+    input[type="range"]{width:100%;min-height:44px}
+    .btn{min-height:44px;padding:.55rem .9rem;border-radius:.75rem;background:var(--accent);color:white;border:1px solid var(--accent);font-weight:800}
+    .btn.secondary{background:var(--card);color:var(--text);border-color:var(--border)}
+    .btn:disabled{opacity:.5;cursor:not-allowed}
+    .choice{width:100%;text-align:left;min-height:48px;padding:.7rem .8rem;border:1px solid var(--border);border-radius:.75rem;background:var(--card);color:var(--text)}
+    .choice.selected{outline:2px solid var(--accent);outline-offset:1px}
+    .good{border-left:4px solid var(--s3)}
+    .warn{border-left:4px solid var(--s5)}
+    .formula{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:800;font-size:1.05rem;overflow-wrap:anywhere}
+    .progress{height:.55rem;background:var(--panel);border-radius:999px;overflow:hidden;border:1px solid var(--border)}
+    .progress>div{height:100%;background:var(--accent);transition:width .2s ease}
+    .flex{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+    .between{justify-content:space-between}
+    .grow{flex:1}
+    ol{padding-left:1.4rem}
+    .footer{margin:1.3rem 0 .5rem;color:var(--muted);font-size:.85rem}
+    :focus-visible{outline:3px solid color-mix(in srgb,var(--accent) 70%,white);outline-offset:2px}
+    @media(max-width:620px){
+      .app{padding:12px}
+      .grid{grid-template-columns:1fr}
+      .metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .quarter{font-size:.78rem;padding:.75rem .2rem}
+      .tab{flex:1 1 45%}
+    }
+    @media(prefers-reduced-motion:reduce){.progress>div{transition:none}}
+  </style>
+</head>
+<body>
+<main class="app" id="quartile-lab">
+  <header class="hero">
+    <div class="tiny bold muted">HIGHER GCSE STATISTICS • INTERACTIVE REFERENCE</div>
+    <h1>Quartiles: The Banana Competition Lab 🍌</h1>
+    <p>Understand what Q1, Q2, Q3, IQR, range and outliers <strong>mean</strong> — not just the formulas.</p>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Learning sections">
+    <button type="button" class="tab" data-tab="basics" aria-selected="true">1 · Basics</button>
+    <button type="button" class="tab" data-tab="range" aria-selected="false">2 · Why IQR?</button>
+    <button type="button" class="tab" data-tab="outliers" aria-selected="false">3 · Outliers</button>
+    <button type="button" class="tab" data-tab="quiz" aria-selected="false">4 · GCSE Quiz</button>
+    <button type="button" class="tab" data-tab="cheat" aria-selected="false">5 · Forget-me-not</button>
+  </nav>
+
+  <section class="panel active" data-panel="basics">
+    <div class="card">
+      <div class="small bold muted">THE CORE IDEA</div>
+      <div class="big mt1">Quartiles are gates in an ordered crowd — not averages of four groups.</div>
+      <p class="mt2">Imagine 100 banana contestants lined up from the person who ate the fewest bananas to the person who ate the most.</p>
+
+      <div class="ruler" aria-label="Four equal quarters">
+        <div class="quarter">Lowest<br>25%</div>
+        <div class="quarter">25–50%</div>
+        <div class="quarter">50–75%</div>
+        <div class="quarter">Highest<br>25%</div>
+      </div>
+      <div class="gates" aria-hidden="true"><span>↑ Q1</span><span>↑ Q2</span><span>↑ Q3</span></div>
+
+      <div class="grid mt4">
+        <div class="soft"><strong>Q1 = 25th-percentile gate</strong><br><span class="muted">About 25% of observations are at or below this point.</span></div>
+        <div class="soft"><strong>Q2 = 50th-percentile gate</strong><br><span class="muted">This is the median: the middle of the ordered data.</span></div>
+        <div class="soft"><strong>Q3 = 75th-percentile gate</strong><br><span class="muted">This is roughly where the highest 25% begins.</span></div>
+        <div class="soft"><strong>“Fourth quartile” ≠ Q4 boundary</strong><br><span class="muted">The top 25% may be called the fourth quartile, but the usual boundaries are Q1, Q2 and Q3. The far end is the maximum.</span></div>
+      </div>
+    </div>
+
+    <div class="card mt4">
+      <div class="bold">Tap each misconception</div>
+      <p class="muted small mt1">These are the traps worth learning to reject.</p>
+      <div class="space mt3">
+        <div><button type="button" class="mis">“Q1 is the average of the lowest 25%.”</button><div class="answer"><strong>❌ No.</strong> Q1 is a boundary value near the 25th percentile. It is not the mean of that group.</div></div>
+        <div><button type="button" class="mis">“Q2 is the average of the second quarter.”</button><div class="answer"><strong>❌ No.</strong> Q2 is the median of the whole ordered data set.</div></div>
+        <div><button type="button" class="mis">“Q3 is the average of the biggest eaters.”</button><div class="answer"><strong>❌ No.</strong> Q3 is the gate near 75%. The highest 25% lies beyond it.</div></div>
+        <div><button type="button" class="mis">“IQR is the average of the normal 80%.”</button><div class="answer"><strong>❌ No.</strong> IQR is not an average and not 80%. It is the width of the middle 50%: Q3 − Q1.</div></div>
+        <div><button type="button" class="mis">“Anyone in the highest quarter is an outlier.”</button><div class="answer"><strong>❌ Definitely not.</strong> The top 25% are simply larger observations. An outlier must be much farther away, beyond an outlier fence.</div></div>
+      </div>
+    </div>
+
+    <div class="card good mt4">
+      <div class="bold">Say it in banana language</div>
+      <p class="mt2">If <strong>Q1 = 4</strong>, <strong>Q2 = 7</strong> and <strong>Q3 = 11</strong> bananas:</p>
+      <p class="mt2"><strong>Q1:</strong> lower-quarter gate around 4 bananas.<br><strong>Q2:</strong> middle contestant around 7 bananas.<br><strong>Q3:</strong> top-quarter gate around 11 bananas.</p>
+      <p class="mt2"><strong>IQR = 11 − 4 = 7 bananas</strong> means the middle half of the crowd spans a 7-banana-wide interval.</p>
+    </div>
+  </section>
+
+  <section class="panel" data-panel="range">
+    <div class="card">
+      <div class="small bold muted">LIVE BANANA EXPERIMENT</div>
+      <div class="big mt1">Turn one contestant into an extreme eater.</div>
+      <p class="mt2">Move the slider. Watch what happens to the <strong>range and mean</strong> compared with the <strong>median and IQR</strong>.</p>
+      <label class="mt4" for="extreme-slider">Biggest eater: <span id="extreme-label">14</span> bananas</label>
+      <input id="extreme-slider" type="range" min="14" max="80" value="14" step="1">
+      <div id="banana-data" class="data" aria-label="Sorted banana counts"></div>
+      <div class="metrics mt4">
+        <div class="metric"><div class="muted small">Range</div><div id="m-range" class="big">—</div></div>
+        <div class="metric"><div class="muted small">Mean</div><div id="m-mean" class="big">—</div></div>
+        <div class="metric"><div class="muted small">Median Q2</div><div id="m-median" class="big">—</div></div>
+        <div class="metric"><div class="muted small">IQR</div><div id="m-iqr" class="big">—</div></div>
+      </div>
+      <div id="range-message" class="soft mt3" aria-live="polite"></div>
+    </div>
+
+    <div class="grid mt4">
+      <div class="card">
+        <div class="bold">Range</div>
+        <div class="formula mt2">maximum − minimum</div>
+        <p class="mt2">Range asks: <strong>how far apart are the two most extreme values?</strong></p>
+        <p class="muted mt2">Useful, but one bizarre observation can make it enormous.</p>
+      </div>
+      <div class="card">
+        <div class="bold">IQR</div>
+        <div class="formula mt2">Q3 − Q1</div>
+        <p class="mt2">IQR asks: <strong>how wide is the middle 50% of the data?</strong></p>
+        <p class="muted mt2">Because it ignores the extreme tails, it is much more resistant to one wild value.</p>
+      </div>
+    </div>
+
+    <div class="card mt4">
+      <div class="bold">Same range, completely different crowd</div>
+      <p class="muted small mt1">Range alone can hide the shape of the data.</p>
+      <div class="grid mt3">
+        <div class="soft"><strong>Apple contest A 🍎</strong><div class="data"><span>0</span><span>4</span><span>5</span><span>5</span><span>6</span><span>6</span><span>7</span><span>7</span><span>8</span><span>8</span><span>9</span><span>9</span><span>10</span><span>10</span><span>11</span><span>20</span></div><p class="mt2"><strong>Range = 20</strong>, but most people are tightly bunched. <strong>IQR = 4</strong>.</p></div>
+        <div class="soft"><strong>Apple contest B 🍎</strong><div class="data"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span></div><p class="mt2"><strong>Range = 20</strong> again, but the middle is much more spread out. <strong>IQR = 13</strong>.</p></div>
+      </div>
+    </div>
+
+    <div class="card warn mt4">
+      <div class="bold">Why this matters for data quality</div>
+      <p class="mt2">Quartiles help you notice unusual values without letting those unusual values define the whole story. A suspicious value might be a typing error, a broken sensor, or a genuinely extraordinary contestant.</p>
+      <p class="mt2"><strong>Good statistical habit:</strong> flag an outlier for investigation; do not automatically delete it.</p>
+    </div>
+  </section>
+
+  <section class="panel" data-panel="outliers">
+    <div class="card">
+      <div class="small bold muted">OUTLIER LAB</div>
+      <div class="big mt1">Build the fences yourself.</div>
+      <p class="mt2">Enter Q1, Q3 and a value x. The lab calculates the IQR and both outlier boundaries.</p>
+      <form id="outlier-form" class="mt4">
+        <div class="grid">
+          <label>Q1<input id="oq1" type="number" value="13" step="any"></label>
+          <label>Q3<input id="oq3" type="number" value="21" step="any"></label>
+          <label>Value x<input id="ox" type="number" value="-7" step="any"></label>
+          <div class="flex" style="align-items:end"><button class="btn grow" type="submit">Check x</button></div>
+        </div>
+      </form>
+      <div id="outlier-result" class="soft mt4" aria-live="polite"></div>
+    </div>
+
+    <div class="card mt4">
+      <div class="bold">The fence recipe</div>
+      <ol class="mt2 space">
+        <li>Find <strong>IQR = Q3 − Q1</strong>.</li>
+        <li>Multiply it by <strong>1.5</strong>.</li>
+        <li>Lower fence = <strong>Q1 − 1.5 × IQR</strong>.</li>
+        <li>Upper fence = <strong>Q3 + 1.5 × IQR</strong>.</li>
+        <li>A value is an outlier if it is <strong>below</strong> the lower fence or <strong>above</strong> the upper fence.</li>
+      </ol>
+      <div class="soft mt3"><strong>GCSE wording trap:</strong> if a value is exactly equal to a fence, it is not beyond the fence. “Below” and “above” are strict.</div>
+    </div>
+  </section>
+
+  <section class="panel" data-panel="quiz">
+    <div class="card">
+      <div class="flex between">
+        <div><div class="small bold muted">GCSE PRACTICE</div><div id="quiz-level" class="bold">Warm-up</div></div>
+        <div class="pill">Score: <span id="quiz-score" style="margin-left:.3rem">0</span></div>
+      </div>
+      <div class="progress mt3"><div id="quiz-progress" style="width:12.5%"></div></div>
+      <div id="quiz-count" class="small muted mt2">Question 1 of 8</div>
+      <div id="quiz-question" class="big mt3"></div>
+      <div id="quiz-options" class="space mt3"></div>
+      <div id="quiz-feedback" class="mt3" aria-live="polite"></div>
+      <div class="flex mt4">
+        <button id="quiz-check" type="button" class="btn">Check answer</button>
+        <button id="quiz-next" type="button" class="btn secondary" disabled>Next question</button>
+        <button id="quiz-restart" type="button" class="btn secondary">Restart</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" data-panel="cheat">
+    <div class="card">
+      <div class="small bold muted">IF YOU FORGET EVERYTHING ELSE</div>
+      <div class="big mt1">Remember the crowd and the three gates.</div>
+      <div class="ruler mt4">
+        <div class="quarter">Lowest 25%</div><div class="quarter">Next 25%</div><div class="quarter">Next 25%</div><div class="quarter">Highest 25%</div>
+      </div>
+      <div class="gates"><span>Q1</span><span>Q2</span><span>Q3</span></div>
+      <div class="space mt5">
+        <div class="soft"><strong>Q1:</strong> lower-quarter boundary, around the 25th percentile.</div>
+        <div class="soft"><strong>Q2:</strong> median, around the 50th percentile.</div>
+        <div class="soft"><strong>Q3:</strong> upper-quarter boundary, around the 75th percentile.</div>
+        <div class="soft"><strong>IQR = Q3 − Q1:</strong> width of the middle 50%. It is <em>not</em> an average.</div>
+        <div class="soft"><strong>Range = max − min:</strong> width from the smallest to the largest value.</div>
+        <div class="soft"><strong>Outlier:</strong> unusually far outside the main body of the data, commonly checked using the 1.5 × IQR fences.</div>
+      </div>
+    </div>
+    <div class="grid mt4">
+      <div class="card"><strong>Ask “position?”</strong><p class="mt1 muted">Think Q1, Q2, Q3.</p></div>
+      <div class="card"><strong>Ask “middle spread?”</strong><p class="mt1 muted">Think IQR.</p></div>
+      <div class="card"><strong>Ask “total extreme spread?”</strong><p class="mt1 muted">Think range.</p></div>
+      <div class="card"><strong>Ask “possible weird value?”</strong><p class="mt1 muted">Think outlier fences.</p></div>
+    </div>
+    <p class="small muted mt4">For a raw list of numbers, exact quartile-calculation conventions can differ slightly between courses or calculators. The meanings above — 25%, 50%, 75%, middle 50% and outlier logic — stay the same.</p>
+  </section>
+
+  <p class="footer">Standalone, offline, pure HTML/CSS/JavaScript. No libraries or internet connection required.</p>
+
+<script>
+(() => {
+  const root = document.getElementById('quartile-lab');
+
+  const tabs = [...root.querySelectorAll('.tab')];
+  const panels = [...root.querySelectorAll('.panel')];
+  tabs.forEach(btn => btn.addEventListener('click', () => {
+    tabs.forEach(b => b.setAttribute('aria-selected', String(b === btn)));
+    panels.forEach(p => p.classList.toggle('active', p.dataset.panel === btn.dataset.tab));
+  }));
+
+  root.querySelectorAll('.mis').forEach(btn => btn.addEventListener('click', () => {
+    btn.nextElementSibling.classList.toggle('open');
+  }));
+
+  const median = a => {
+    const n = a.length;
+    return n % 2 ? a[(n - 1) / 2] : (a[n / 2 - 1] + a[n / 2]) / 2;
+  };
+
+  const quartiles = a => {
+    const s = [...a].sort((x, y) => x - y);
+    const n = s.length;
+    const q2 = median(s);
+    const lower = s.slice(0, Math.floor(n / 2));
+    const upper = s.slice(Math.ceil(n / 2));
+    return { q1: median(lower), q2, q3: median(upper) };
+  };
+
+  const fmt = n => Number.isInteger(n) ? String(n) : String(Math.round(n * 100) / 100);
+
+  const base = [2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,11,12,13];
+  const slider = root.querySelector('#extreme-slider');
+  const extremeLabel = root.querySelector('#extreme-label');
+  const dataBox = root.querySelector('#banana-data');
+  const rangeMsg = root.querySelector('#range-message');
+
+  function renderBananas() {
+    const extreme = Number(slider.value);
+    const s = [...base, extreme].sort((a, b) => a - b);
+    const qs = quartiles(s);
+    const range = s[s.length - 1] - s[0];
+    const mean = s.reduce((a, b) => a + b, 0) / s.length;
+    const iqr = qs.q3 - qs.q1;
+
+    extremeLabel.textContent = extreme;
+    dataBox.innerHTML = s.map((v, i) => {
+      const group = Math.min(4, Math.floor(i / (s.length / 4)) + 1);
+      return '<span class="g' + group + '">' + v + '</span>';
+    }).join('');
+
+    root.querySelector('#m-range').textContent = fmt(range);
+    root.querySelector('#m-mean').textContent = fmt(mean);
+    root.querySelector('#m-median').textContent = fmt(qs.q2);
+    root.querySelector('#m-iqr').textContent = fmt(iqr);
+
+    rangeMsg.innerHTML = extreme <= 16
+      ? '<strong>Start here:</strong> the crowd is fairly ordinary. Now drag the biggest eater towards 80.'
+      : 'The biggest eater is now <strong>' + extreme + '</strong>. The <strong>range has stretched to ' + fmt(range) +
+        '</strong> and the mean has moved, while the <strong>median and IQR barely care</strong>. That resistance is a major reason quartiles are useful.';
+  }
+
+  slider.addEventListener('input', renderBananas);
+  renderBananas();
+
+  const form = root.querySelector('#outlier-form');
+  const outResult = root.querySelector('#outlier-result');
+
+  function runOutlier(e) {
+    if (e) e.preventDefault();
+    const q1 = Number(root.querySelector('#oq1').value);
+    const q3 = Number(root.querySelector('#oq3').value);
+    const x = Number(root.querySelector('#ox').value);
+
+    if (!Number.isFinite(q1) || !Number.isFinite(q3) || !Number.isFinite(x)) {
+      outResult.textContent = 'Enter valid numbers for Q1, Q3 and x.';
+      return;
+    }
+    if (q3 < q1) {
+      outResult.textContent = 'Q3 cannot be below Q1. Check the values.';
+      return;
+    }
+
+    const iqr = q3 - q1;
+    const low = q1 - 1.5 * iqr;
+    const high = q3 + 1.5 * iqr;
+    const isOut = x < low || x > high;
+
+    outResult.innerHTML =
+      '<div class="formula">IQR = ' + fmt(q3) + ' − ' + fmt(q1) + ' = ' + fmt(iqr) + '</div>' +
+      '<div class="mt2">Lower fence = <strong>' + fmt(low) + '</strong><br>Upper fence = <strong>' + fmt(high) + '</strong></div>' +
+      '<div class="big mt3">' + (isOut ? '✅ ' + fmt(x) + ' is an outlier by this rule.' : '➖ ' + fmt(x) + ' is not an outlier by this rule.') + '</div>';
+  }
+
+  form.addEventListener('submit', runOutlier);
+  runOutlier();
+
+  const quiz = [
+    {level:'Warm-up',q:'What does Q3 most nearly represent?',choices:['The average of the top 25%','The boundary around the 75th percentile','The maximum value','The average of the entire data set'],a:1,why:'Q3 is a boundary: roughly 75% of observations lie at or below it, and the highest quarter begins around there.'},
+    {level:'Warm-up',q:'Q1 = 12 and Q3 = 26. What is the IQR?',input:true,a:14,why:'IQR = Q3 − Q1 = 26 − 12 = 14.'},
+    {level:'Core',q:'Q1 = 13 and Q3 = 21. Which value is definitely an outlier?',choices:['17','20','15','3','−7'],a:4,why:'IQR = 8. Fences are 1 and 33. −7 is below 1.'},
+    {level:'Core',q:'Which pair is generally least affected by one extreme outlier?',choices:['Mean and range','Median and IQR','Mean and IQR','Median and range'],a:1,why:'Median and IQR focus on the middle of the ordered data, so they are resistant to extreme values.'},
+    {level:'Core',q:'Ordered data: 2, 4, 5, 6, 7, 8, 9, 10, 12. What is Q2?',input:true,a:7,why:'There are 9 values, so the 5th value is the median: Q2 = 7.'},
+    {level:'Higher',q:'Two data sets both have range 20. Can their IQRs be very different?',choices:['No — same range forces the same IQR','Yes — range only uses the two extremes','Only if their means are equal','Only if one contains negative values'],a:1,why:'Yes. Range sees only minimum and maximum; the middle 50% can be tightly packed or widely spread.'},
+    {level:'Higher',q:'Q1 = 10 and Q3 = 18. A value is exactly 30. Is 30 an outlier under the 1.5 × IQR rule?',choices:['Yes','No'],a:1,why:'IQR = 8, so the upper fence is 18 + 12 = 30. The rule says above 30, not equal to 30.'},
+    {level:'Higher',q:'Q1 = 21 and Q3 = 34. x is exactly 4 above the upper outlier boundary. Find x.',input:true,a:57.5,why:'IQR = 13. Upper fence = 34 + 1.5×13 = 53.5. Four above gives x = 57.5.'}
+  ];
+
+  let qi = 0, score = 0, selected = null, locked = false;
+  const qQuestion = root.querySelector('#quiz-question');
+  const qOptions = root.querySelector('#quiz-options');
+  const qFeedback = root.querySelector('#quiz-feedback');
+  const qNext = root.querySelector('#quiz-next');
+  const qCheck = root.querySelector('#quiz-check');
+
+  function renderQuiz() {
+    const item = quiz[qi];
+    selected = null;
+    locked = false;
+
+    root.querySelector('#quiz-level').textContent = item.level;
+    root.querySelector('#quiz-count').textContent = 'Question ' + (qi + 1) + ' of ' + quiz.length;
+    root.querySelector('#quiz-progress').style.width = (((qi + 1) / quiz.length) * 100) + '%';
+    root.querySelector('#quiz-score').textContent = score;
+    qQuestion.textContent = item.q;
+    qFeedback.innerHTML = '';
+    qNext.disabled = true;
+    qCheck.disabled = false;
+
+    if (item.input) {
+      qOptions.innerHTML = '<label>Your answer<input id="quiz-number" type="number" step="any" inputmode="decimal"></label>';
+    } else {
+      qOptions.innerHTML = item.choices.map((c, i) =>
+        '<button type="button" class="choice" data-choice="' + i + '">' + c + '</button>'
+      ).join('');
+
+      qOptions.querySelectorAll('.choice').forEach(b => b.addEventListener('click', () => {
+        if (locked) return;
+        selected = Number(b.dataset.choice);
+        qOptions.querySelectorAll('.choice').forEach(x => x.classList.toggle('selected', x === b));
+      }));
+    }
+  }
+
+  qCheck.addEventListener('click', () => {
+    if (locked) return;
+    const item = quiz[qi];
+    let ok = false;
+
+    if (item.input) {
+      const el = root.querySelector('#quiz-number');
+      const val = Number(el.value);
+      if (el.value.trim() === '' || !Number.isFinite(val)) {
+        qFeedback.innerHTML = '<div class="soft">Enter a number first.</div>';
+        return;
+      }
+      ok = Math.abs(val - item.a) < 1e-9;
+    } else {
+      if (selected === null) {
+        qFeedback.innerHTML = '<div class="soft">Choose an answer first.</div>';
+        return;
+      }
+      ok = selected === item.a;
+    }
+
+    locked = true;
+    if (ok) score++;
+    root.querySelector('#quiz-score').textContent = score;
+
+    qFeedback.innerHTML =
+      '<div class="soft ' + (ok ? 'good' : 'warn') + '">' +
+      '<strong>' + (ok ? '✅ Correct' : '❌ Not quite') + '</strong>' +
+      '<p class="mt1">' + item.why + '</p></div>';
+
+    qNext.disabled = false;
+    qCheck.disabled = true;
+    if (qi === quiz.length - 1) qNext.textContent = 'See result';
+  });
+
+  qNext.addEventListener('click', () => {
+    if (!locked) return;
+
+    if (qi < quiz.length - 1) {
+      qi++;
+      qNext.textContent = 'Next question';
+      renderQuiz();
+    } else {
+      const pct = Math.round(score / quiz.length * 100);
+      qQuestion.textContent = 'Finished: ' + score + '/' + quiz.length;
+      qOptions.innerHTML = '';
+      qCheck.disabled = true;
+      qNext.disabled = true;
+
+      const msg = pct >= 88
+        ? 'Excellent — the ideas and the GCSE traps are sticking.'
+        : pct >= 63
+          ? 'Good progress — revisit any explanation that caught you out.'
+          : 'Go back through Basics and Why IQR?, then try again. The aim is understanding the picture, not memorising blindly.';
+
+      qFeedback.innerHTML = '<div class="soft good"><div class="big">' + pct + '%</div><p class="mt1">' + msg + '</p></div>';
+    }
+  });
+
+  root.querySelector('#quiz-restart').addEventListener('click', () => {
+    qi = 0;
+    score = 0;
+    qNext.textContent = 'Next question';
+    renderQuiz();
+  });
+
+  renderQuiz();
+})();
+</script>
+</main>
+</body>
+</html>
