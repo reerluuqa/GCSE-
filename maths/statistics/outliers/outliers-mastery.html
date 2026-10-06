@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GCSE Higher Maths — Outliers Mastery</title>
+<style>
+  :root{
+    --bg:#f5f7fb;
+    --paper:#ffffff;
+    --ink:#151922;
+    --muted:#5d6675;
+    --line:#dfe4ec;
+    --accent:#3157d5;
+    --accent2:#1637a5;
+    --good:#137a42;
+    --goodbg:#eaf8f0;
+    --bad:#b42318;
+    --badbg:#fff0ef;
+    --warn:#8b5e00;
+    --warnbg:#fff8df;
+    --shadow:0 12px 32px rgba(30,41,59,.10);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;line-height:1.45}
+  button,input,select{font:inherit}
+  .app{max-width:1050px;margin:0 auto;padding:24px}
+  .topbar{display:flex;gap:18px;justify-content:space-between;align-items:flex-start;margin-bottom:18px}
+  .brand h1{font-size:clamp(1.55rem,2.8vw,2.35rem);margin:0 0 5px;letter-spacing:-.025em}
+  .brand p{margin:0;color:var(--muted);max-width:720px}
+  .badge{white-space:nowrap;background:#eef2ff;color:#2944a7;border:1px solid #d9e0ff;border-radius:999px;padding:7px 11px;font-size:.85rem;font-weight:800}
+  .grid{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:18px}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow)}
+  .main{padding:24px}
+  .side{padding:18px;height:max-content;position:sticky;top:18px}
+  .progressRow{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:10px;color:var(--muted);font-size:.92rem;font-weight:700}
+  .progress{height:9px;background:#e9edf4;border-radius:999px;overflow:hidden}
+  .progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--accent),#6f82ed);transition:width .25s ease}
+  .meta{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 12px}
+  .pill{border:1px solid var(--line);border-radius:999px;padding:5px 9px;font-size:.78rem;font-weight:800;color:#3c4655;background:#fafbfc}
+  .pill.higher{background:#fff6e5;border-color:#f0d59e;color:#72500d}
+  .qno{font-size:.95rem;color:var(--muted);font-weight:800;margin-top:16px}
+  .question{font-family:Arial,Helvetica,sans-serif;font-size:clamp(1.25rem,2.8vw,1.75rem);font-weight:700;margin:10px 0 18px;line-height:1.38}
+  .dataset{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0 20px}
+  .datum{min-width:62px;text-align:center;border:1px solid #cfd6e3;background:#fbfcfe;padding:10px 12px;border-radius:9px;font-family:Arial,Helvetica,sans-serif;font-size:1.15rem;font-weight:700}
+  .statementBox{background:#fafbfe;border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:12px 0 18px;font-family:Arial,Helvetica,sans-serif;font-size:1.02rem}
+  .answerArea{margin-top:16px}
+  .inputRow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  input[type="text"],input[type="number"]{width:min(280px,100%);padding:12px 14px;border:2px solid #c9d1df;border-radius:10px;background:#fff;outline:none;font-weight:700;font-size:1.05rem}
+  input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(49,87,213,.12)}
+  .unit{font-weight:800;color:#344054}
+  .choices{display:grid;gap:10px;max-width:700px}
+  .choice{display:flex;gap:10px;align-items:flex-start;border:1.5px solid #ccd4e1;border-radius:11px;padding:12px 13px;cursor:pointer;background:white;transition:.15s}
+  .choice:hover{border-color:#8fa0c4;background:#fbfcff}
+  .choice input{margin-top:3px;accent-color:var(--accent)}
+  .choice:has(input:checked){border-color:var(--accent);background:#f1f4ff}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+  button{border:0;border-radius:10px;padding:11px 15px;font-weight:850;cursor:pointer}
+  .primary{background:var(--accent);color:#fff}
+  .primary:hover{background:var(--accent2)}
+  .secondary{background:#eef1f6;color:#2f3846}
+  .ghost{background:white;border:1px solid #cfd6e3;color:#344054}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  .feedback{display:none;margin-top:20px;border-radius:14px;padding:16px 17px;border:1px solid}
+  .feedback.good{display:block;background:var(--goodbg);border-color:#b8e2c9}
+  .feedback.bad{display:block;background:var(--badbg);border-color:#f0c3bf}
+  .feedback h3{margin:0 0 7px;font-size:1.05rem}
+  .feedback.good h3{color:var(--good)}
+  .feedback.bad h3{color:var(--bad)}
+  .feedback p{margin:7px 0}
+  .coach{margin-top:12px;background:rgba(255,255,255,.68);border:1px solid rgba(0,0,0,.07);border-radius:10px;padding:12px}
+  .coach b{display:inline-block;margin-bottom:2px}
+  .formula{font-family:"Courier New",monospace;background:#fff;border:1px solid rgba(0,0,0,.11);padding:2px 6px;border-radius:6px}
+  .hint{display:none;margin-top:14px;background:var(--warnbg);border:1px solid #efd99a;border-radius:11px;padding:12px 14px;color:#654700}
+  .hint.show{display:block}
+  .side h2{font-size:1rem;margin:0 0 12px}
+  .scoreGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px}
+  .stat{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:10px}
+  .stat .n{font-size:1.35rem;font-weight:900;line-height:1}
+  .stat .l{font-size:.74rem;color:var(--muted);font-weight:800;margin-top:4px}
+  .mastery{display:grid;gap:10px}
+  .skill{font-size:.8rem}
+  .skillTop{display:flex;justify-content:space-between;gap:8px;margin-bottom:4px;font-weight:800}
+  .mini{height:7px;background:#edf0f5;border-radius:999px;overflow:hidden}
+  .mini>div{height:100%;background:#6276df;width:0;transition:width .2s}
+  .sideNote{font-size:.77rem;color:var(--muted);margin:14px 0 0}
+  .tabs{display:flex;gap:8px;margin-top:16px}
+  .tabs button{padding:8px 10px;font-size:.8rem}
+  .tabs button.active{background:#1e293b;color:white}
+  .report{display:none;text-align:center;padding:22px 4px 6px}
+  .report.show{display:block}
+  .report h2{font-size:1.65rem;margin:0 0 8px}
+  .report p{color:var(--muted)}
+  .reportBox{max-width:720px;margin:18px auto;text-align:left;background:#f8fafc;border:1px solid var(--line);border-radius:14px;padding:16px}
+  .reportLine{display:flex;justify-content:space-between;gap:16px;padding:8px 0;border-bottom:1px solid #e3e7ef}
+  .reportLine:last-child{border-bottom:0}
+  .tiny{font-size:.78rem;color:var(--muted)}
+  .examTip{margin-top:14px;background:#f0f4ff;border-left:4px solid var(--accent);padding:10px 12px;border-radius:6px;font-size:.92rem}
+  .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;border:1px solid #cbd3df;border-bottom-width:2px;padding:1px 5px;border-radius:5px;background:white;font-size:.78rem}
+  @media(max-width:820px){.grid{grid-template-columns:1fr}.side{position:static}.topbar{flex-direction:column}.badge{white-space:normal}.main{padding:18px}.app{padding:12px}}
+  @media print{.side,.actions,.topbar p,.tabs{display:none!important}.grid{display:block}.card{box-shadow:none;border:0}.app{max-width:none}.main{padding:0}.feedback{break-inside:avoid}}
+</style>
+<link rel="stylesheet" href="../../../assets/activity.css">
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="brand">
+      <h1>Outliers & Data Reasoning — Mastery Trainer</h1>
+      <p>Original GCSE Higher-style practice: start with instant outlier spotting, then build into range, averages, quartiles, IQR and multi-step reasoning.</p>
+    </div>
+    <div class="badge">GCSE Higher • Statistics S4</div>
+  </div>
+
+  <div class="grid">
+    <main class="card main">
+      <div id="practiceView">
+        <div class="progressRow"><span id="sessionLabel">Question 1 of 24</span><span id="levelLabel">Level 1</span></div>
+        <div class="progress"><div id="progressBar"></div></div>
+
+        <div class="meta">
+          <span class="pill" id="skillPill">Spot the outlier</span>
+          <span class="pill higher" id="difficultyPill">Grade 4–5</span>
+          <span class="pill" id="marksPill">1 mark</span>
+        </div>
+
+        <div class="qno" id="qno">Question 1</div>
+        <div class="question" id="questionText"></div>
+        <div id="visual"></div>
+        <div class="answerArea" id="answerArea"></div>
+
+        <div class="hint" id="hintBox"></div>
+        <div class="actions">
+          <button class="primary" id="checkBtn">Check answer</button>
+          <button class="ghost" id="hintBtn">Hint</button>
+          <button class="secondary" id="nextBtn" disabled>Next question</button>
+        </div>
+
+        <div class="feedback" id="feedback"></div>
+        <div class="examTip"><b>Exam reflex:</b> first identify what is being measured, then decide whether the question is about <b>centre</b> (mean/median) or <b>spread</b> (range/IQR). Outliers mainly attack the mean and range.</div>
+      </div>
+
+      <section class="report" id="reportView">
+        <h2 id="reportTitle">Session complete</h2>
+        <p id="reportSummary"></p>
+        <div class="reportBox" id="reportBox"></div>
+        <button class="primary" id="restartBtn">Start a new adaptive session</button>
+      </section>
+    </main>
+
+    <aside class="card side">
+      <h2>Live session</h2>
+      <div class="scoreGrid">
+        <div class="stat"><div class="n" id="scoreN">0</div><div class="l">CORRECT</div></div>
+        <div class="stat"><div class="n" id="streakN">0</div><div class="l">STREAK</div></div>
+        <div class="stat"><div class="n" id="accuracyN">—</div><div class="l">ACCURACY</div></div>
+        <div class="stat"><div class="n" id="masteredN">0/7</div><div class="l">SKILLS SECURE</div></div>
+      </div>
+
+      <h2>Mastery map</h2>
+      <div class="mastery" id="mastery"></div>
+      <div class="sideNote">A skill is “secure” after repeated correct answers, not one lucky hit. Missed skills are automatically shown more often.</div>
+
+      <div class="tabs">
+        <button class="active" id="adaptiveBtn">Adaptive</button>
+        <button class="secondary" id="hardBtn">Hard-only</button>
+      </div>
+      <div class="sideNote">Progress is saved on this device using local storage. Press <span class="kbd">Enter</span> to check or continue.</div>
+    </aside>
+  </div>
+</div>
+
+<script>
+(() => {
+  const SESSION_LENGTH = 24;
+  const skills = {
+    spot: {name:'Spot the outlier', short:'Outlier spotting'},
+    range: {name:'Outliers & range', short:'Range'},
+    mean: {name:'Outliers & mean', short:'Mean'},
+    median: {name:'Mean vs median', short:'Robust average'},
+    iqr: {name:'Quartiles & IQR', short:'IQR'},
+    compare: {name:'Compare distributions', short:'Comparisons'},
+    algebra: {name:'Reverse / algebraic reasoning', short:'Grade 8–9 reasoning'}
+  };
+
+  let state = loadState();
+  let session = {index:0, correct:0, attempted:0, streak:0, mode:'adaptive', used:[], current:null, checked:false, responses:[]};
+
+  const $ = s => document.querySelector(s);
+  const rand = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
+  const pick = arr => arr[rand(0,arr.length-1)];
+  const shuffle = arr => [...arr].sort(()=>Math.random()-.5);
+  const fmt = n => Number.isInteger(n) ? String(n) : String(Math.round(n*100)/100);
+  const eq = (a,b,tol=1e-9) => Math.abs(Number(a)-Number(b)) <= tol;
+
+  function loadState(){
+    try{
+      const x = JSON.parse(localStorage.getItem('outlierMasteryV2'));
+      if(x && x.mastery) return x;
+    }catch(e){}
+    return {mastery:Object.fromEntries(Object.keys(skills).map(k=>[k,0])), totalCorrect:0, totalAttempted:0};
+  }
+  function saveState(){ localStorage.setItem('outlierMasteryV2', JSON.stringify(state)); }
+
+  function datasetHTML(arr, unit=''){
+    return `<div class="dataset">${arr.map(x=>`<div class="datum">${fmt(x)}${unit}</div>`).join('')}</div>`;
+  }
+
+  function genSpot(){
+    const contexts = [
+      {lead:'The temperatures in six towns, in °C, are', unit:'°C'},
+      {lead:'The journey times, in minutes, are', unit:''},
+      {lead:'The masses, in kg, are', unit:' kg'},
+      {lead:'The changes in share price, in %, are', unit:'%'}
+    ];
+    const c = pick(contexts);
+    let cluster, outlier;
+    if(Math.random()<.45){
+      const base=rand(-8,6); cluster=[base,base+1,base+2,base+3,base+rand(0,3)]; outlier=base+rand(17,28);
+    }else{
+      const base=rand(8,30); cluster=[base,base+rand(0,2),base+2,base+3,base+4]; outlier=base-rand(15,24);
+    }
+    const arr=shuffle([...cluster,outlier]);
+    return {skill:'spot', diff:'Grade 4–5', marks:1,
+      text:`${c.lead}<br><br><b>Write down the outlier.</b>`, visual:datasetHTML(arr,c.unit),
+      type:'number', answer:outlier, unit:c.unit,
+      hint:'Look for the cluster first. The outlier is the value separated from the main group — do not automatically choose the biggest number.',
+      approach:`Find where most values bunch together. Then identify the single value unusually far from that cluster. Here the cluster is ${cluster.slice().sort((a,b)=>a-b).map(fmt).join(', ')}, so <b>${fmt(outlier)}${c.unit}</b> is isolated.`,
+      habit:'Cluster → gap → outlier. That three-word scan is enough for simple 1-mark questions.',
+      trap:'An outlier is not “the largest value” by definition. It can be unusually low.'};
+  }
+
+  function genRange(){
+    const low=rand(8,22), cluster=[low,low+rand(2,4),low+rand(5,8),low+rand(9,12),low+rand(13,16)];
+    cluster.sort((a,b)=>a-b);
+    const highOut=Math.random()<.7;
+    const outlier=highOut ? cluster.at(-1)+rand(25,45) : cluster[0]-rand(18,30);
+    const arr=shuffle([...cluster,outlier]);
+    const newRange=cluster.at(-1)-cluster[0];
+    const oldRange=Math.max(...arr)-Math.min(...arr);
+    const ask=pick(['new','change']);
+    if(ask==='new') return {skill:'range',diff:'Grade 5–6',marks:2,
+      text:`The data set below contains one clear outlier.<br><br>Remove the outlier and work out the <b>new range</b>.`,visual:datasetHTML(arr),type:'number',answer:newRange,unit:'',
+      hint:'Range = largest − smallest. Remove the outlier first, then find the new endpoints.',
+      approach:`The outlier is ${outlier}. After removing it, the smallest value is ${cluster[0]} and the largest is ${cluster.at(-1)}. So range = ${cluster.at(-1)} − ${cluster[0]} = <b>${newRange}</b>.`,
+      habit:'For range questions, physically cross out the outlier before subtracting.',
+      trap:`Do not use the old endpoint. The original range was ${oldRange}, but the question asks for the range after removal.`};
+    const reduction=oldRange-newRange;
+    return {skill:'range',diff:'Grade 5–6',marks:2,
+      text:`The data set below contains one clear outlier.<br><br>By how much does the <b>range decrease</b> when the outlier is removed?`,visual:datasetHTML(arr),type:'number',answer:reduction,unit:'',
+      hint:'Find the original range, then the range without the outlier. Finally subtract the two ranges.',
+      approach:`Original range = ${Math.max(...arr)} − ${Math.min(...arr)} = ${oldRange}. Without ${outlier}, range = ${cluster.at(-1)} − ${cluster[0]} = ${newRange}. Decrease = ${oldRange} − ${newRange} = <b>${reduction}</b>.`,
+      habit:'“By how much” means difference between two answers, not just the new answer.',
+      trap:'A common 1-mark loss is stopping at the new range instead of finding the decrease.'};
+  }
+
+  function genMean(){
+    const n=5;
+    const base=rand(8,18);
+    const normal=[base,base+2,base+4,base+5,base+7];
+    const oldSum=normal.reduce((a,b)=>a+b,0);
+    const oldMean=oldSum/n;
+    const outlier=normal.at(-1)+pick([25,30,35,40]);
+    const newMean=(oldSum+outlier)/(n+1);
+    const which=Math.random()<.62?'calc':'concept';
+    if(which==='calc'){
+      return {skill:'mean',diff:'Grade 6',marks:3,
+        text:`Five values have a mean of <b>${fmt(oldMean)}</b>.<br>A sixth value, <b>${outlier}</b>, is added and is an outlier.<br><br>Work out the new mean.`,
+        visual:'',type:'number',answer:newMean,unit:'',tolerance:.005,
+        hint:`Turn the old mean back into a total first: total = mean × number of values.`,
+        approach:`Old total = ${fmt(oldMean)} × 5 = ${oldSum}. Add the new value: ${oldSum} + ${outlier} = ${oldSum+outlier}. There are now 6 values, so new mean = ${oldSum+outlier} ÷ 6 = <b>${fmt(newMean)}</b>.`,
+        habit:'Mean questions become easy when you think “mean ↔ total”: total = mean × frequency.',
+        trap:'Do not average the old mean and the new value. The old mean represents five values, not one.'};
+    }
+    return {skill:'mean',diff:'Grade 5–6',marks:1,
+      text:`A data set has mean ${fmt(oldMean)}. A new value of ${outlier}, much larger than all the existing values, is added.<br><br>What happens to the mean?`,
+      visual:'',type:'choice',choices:['It decreases','It stays the same','It increases','There is not enough information'],answerIndex:2,
+      hint:'A very large added value pulls the balance point of the data towards itself.',
+      approach:`The new value ${outlier} is above the old mean ${fmt(oldMean)}, so it pulls the mean upward. The mean <b>increases</b>.`,
+      habit:'Added value above current mean → mean rises. Added value below current mean → mean falls.',
+      trap:'“Outlier” does not automatically mean the mean decreases; direction matters.'};
+  }
+
+  function genMedian(){
+    const questions=[
+      {
+        text:'A house-price data set contains one extremely expensive house. Which average is usually more representative of a typical house price?',
+        choices:['Mean','Median','Range','Interquartile range'],answerIndex:1,
+        approach:'The extreme high value can pull the mean upward, while the median depends mainly on position. So the <b>median</b> is usually more representative.',
+        habit:'Outlier + “typical average” → think median first.',trap:'Range and IQR measure spread, not average.'
+      },
+      {
+        text:'A data set has one extreme outlier. Which pair is generally least affected by that outlier?',
+        choices:['Mean and range','Median and IQR','Mean and IQR','Median and range'],answerIndex:1,
+        approach:'The <b>median</b> is position-based and the <b>IQR</b> uses the middle 50% of values, so both are resistant to a single extreme value.',
+        habit:'Robust pair = median + IQR.',trap:'The range uses the two extremes, so it is especially sensitive to an outlier.'
+      },
+      {
+        text:'A data set contains an unusually low outlier. Which statement must be true?',
+        choices:['The outlier makes the median smaller','The outlier makes the range larger than it would be without it','The outlier makes the IQR larger','The mean becomes negative'],answerIndex:1,
+        approach:'An extreme low value becomes the minimum, stretching the distance from minimum to maximum. Therefore it makes the <b>range larger</b> than it would be without that value.',
+        habit:'Range uses extremes, so an extreme outlier almost always changes it strongly.',trap:'You cannot say what happens to IQR or the sign of the mean without more information.'
+      }
+    ];
+    const q=pick(questions);
+    return {skill:'median',diff:'Grade 6',marks:1,text:q.text,visual:'',type:'choice',choices:q.choices,answerIndex:q.answerIndex,
+      hint:'Ask: which statistics use extreme values directly, and which depend mostly on position?',approach:q.approach,habit:q.habit,trap:q.trap};
+  }
+
+  function genIQR(){
+    const q1=rand(10,25); const q3=q1+pick([8,10,12,14]); const iqr=q3-q1;
+    const lower=q1-1.5*iqr, upper=q3+1.5*iqr;
+    const high=Math.random()<.5;
+    const candidate = high ? Math.ceil(upper)+rand(1,8) : Math.floor(lower)-rand(1,8);
+    const near = high ? Math.floor(upper)-rand(0,2) : Math.ceil(lower)+rand(0,2);
+    const askBoundary=Math.random()<.45;
+    const rule=`A value is called an outlier if it is below Q1 − 1.5 × IQR or above Q3 + 1.5 × IQR.`;
+    if(askBoundary){
+      const upperAsk=Math.random()<.5;
+      const ans=upperAsk?upper:lower;
+      return {skill:'iqr',diff:'Grade 7–8',marks:3,
+        text:`For a data set, Q1 = ${q1} and Q3 = ${q3}.<br><br>${rule}<br><br>Work out the <b>${upperAsk?'upper':'lower'} outlier boundary</b>.`,
+        visual:'',type:'number',answer:ans,unit:'',tolerance:.005,
+        hint:'First find IQR = Q3 − Q1. Then multiply the IQR by 1.5 before adding to Q3 or subtracting from Q1.',
+        approach:`IQR = ${q3} − ${q1} = ${iqr}. Then 1.5 × IQR = ${fmt(1.5*iqr)}. ${upperAsk?'Upper':'Lower'} boundary = ${upperAsk?q3:q1} ${upperAsk?'+':'−'} ${fmt(1.5*iqr)} = <b>${fmt(ans)}</b>.`,
+        habit:'IQR rule: subtract Q1 from Q3 first. Never multiply Q1 or Q3 by 1.5.',
+        trap:'The 1.5 applies to the IQR, not to the quartile.'};
+    }
+    const vals=shuffle([candidate,near,q1+2,q1+Math.floor(iqr/2),q3-1]);
+    return {skill:'iqr',diff:'Grade 7–8',marks:4,
+      text:`For a data set, Q1 = ${q1} and Q3 = ${q3}.<br><br>${rule}<br><br>Which listed value is definitely an outlier by this rule?`,
+      visual:datasetHTML(vals),type:'number',answer:candidate,unit:'',
+      hint:'Calculate IQR, then both boundaries. A value has to cross a boundary — merely being the largest or smallest is not enough.',
+      approach:`IQR = ${q3} − ${q1} = ${iqr}. Boundaries are ${fmt(lower)} and ${fmt(upper)}. The value <b>${candidate}</b> lies ${high?'above':'below'} the relevant boundary, so it is an outlier.`,
+      habit:'Formal outlier rule = calculate boundaries first, then test values.',
+      trap:`A value such as ${near} is extreme-looking but is still inside the boundary, so it is not an outlier by the stated rule.`};
+  }
+
+  function genCompare(){
+    const medA=rand(38,65); const delta=pick([-6,-5,-4,-3,-2,-1,1,2,3,4,5,6,7,8]); const medB=medA+delta;
+    const iqrA=rand(7,15), iqrB=iqrA+rand(4,10);
+    const contexts=pick([
+      ['battery lives','hours','lasts longer','is more consistent'],
+      ['test scores','marks','has the higher typical score','is more consistent'],
+      ['delivery times','minutes','has the higher typical time','is more consistent']
+    ]);
+    const higherMedian=medA>medB?'A':medB>medA?'B':'same';
+    const consistent=iqrA<iqrB?'A':'B';
+    const choices=shuffle([
+      `Group ${higherMedian} has the higher median; Group ${consistent} is more consistent`,
+      `Group ${higherMedian==='A'?'B':'A'} has the higher median; Group ${consistent} is more consistent`,
+      `Group ${higherMedian} has the higher median; Group ${consistent==='A'?'B':'A'} is more consistent`,
+      `The group with the larger IQR is more consistent`
+    ]);
+    const correct=`Group ${higherMedian} has the higher median; Group ${consistent} is more consistent`;
+    return {skill:'compare',diff:'Grade 6–7',marks:3,
+      text:`Two groups are compared using ${contexts[0]}.<br><br>Group A: median = ${medA} ${contexts[1]}, IQR = ${iqrA} ${contexts[1]}<br>Group B: median = ${medB} ${contexts[1]}, IQR = ${iqrB} ${contexts[1]}<br><br>Which comparison is correct?`,
+      visual:'',type:'choice',choices,answerIndex:choices.indexOf(correct),
+      hint:'Median compares the typical/central value. IQR compares spread. Smaller IQR means more consistent.',
+      approach:`Compare like with like: median ${medA} vs ${medB}, so Group ${higherMedian} has the higher typical value. IQR ${iqrA} vs ${iqrB}, so Group ${consistent} has the smaller spread and is more consistent.`,
+      habit:'Comparison sentence template: “___ has the higher median, so ___. ___ has the smaller IQR, so it is more consistent.”',
+      trap:'Do not say “higher IQR = better”. A higher IQR means more spread, not more consistency.'};
+  }
+
+  function genAlgebra(){
+    const style=rand(1,3);
+    if(style===1){
+      const n=5, oldMean=rand(12,24), x=rand(40,70); const newMean=(oldMean*n+x)/(n+1);
+      return {skill:'algebra',diff:'Grade 8–9',marks:4,
+        text:`Five numbers have mean ${oldMean}. A sixth number, x, is added and the new mean is ${fmt(newMean)}.<br><br>Find x.`,
+        visual:'',type:'number',answer:x,unit:'',tolerance:.01,
+        hint:'Convert each mean into a total. New total − old total = x.',
+        approach:`Old total = 5 × ${oldMean} = ${5*oldMean}. New total = 6 × ${fmt(newMean)} = ${fmt(6*newMean)}. Therefore x = ${fmt(6*newMean)} − ${5*oldMean} = <b>${x}</b>.`,
+        habit:'Reverse mean: total after − total before = added value.',
+        trap:'Do not subtract the two means. Means are not totals.'};
+    }
+    if(style===2){
+      const a=rand(7,13); const data=[a,a+1,a+3,a+4,a+5]; const out=a+rand(25,35);
+      const meanAll=(data.reduce((x,y)=>x+y,0)+out)/6;
+      const meanNo=data.reduce((x,y)=>x+y,0)/5;
+      const diff=meanAll-meanNo;
+      return {skill:'algebra',diff:'Grade 8–9',marks:5,
+        text:`The values are shown below. One value is an outlier.<br><br>How much larger is the mean <b>with</b> the outlier than the mean <b>without</b> the outlier?`,
+        visual:datasetHTML(shuffle([...data,out])),type:'number',answer:diff,unit:'',tolerance:.01,
+        hint:'You need two means. Keep the totals organised: calculate with all six values, then without the outlier.',
+        approach:`The outlier is ${out}. Mean with it = ${fmt(meanAll)}. Mean without it = ${fmt(meanNo)}. Difference = ${fmt(meanAll)} − ${fmt(meanNo)} = <b>${fmt(diff)}</b>.`,
+        habit:'Multi-step comparison: label the two quantities before calculating so you do not mix them up.',
+        trap:'The question asks “how much larger”, so your final step must be a subtraction.'};
+    }
+    const q1=rand(20,35), q3=q1+rand(8,14), iqr=q3-q1, upper=q3+1.5*iqr;
+    const c=rand(1,8); const x=upper+c;
+    return {skill:'algebra',diff:'Grade 9 stretch',marks:5,
+      text:`A data set has Q1 = ${q1} and Q3 = ${q3}.<br>A value x is exactly ${c} above the upper outlier boundary, where the boundary is Q3 + 1.5 × IQR.<br><br>Find x.`,
+      visual:'',type:'number',answer:x,unit:'',tolerance:.005,
+      hint:'Work from the inside out: IQR → 1.5 × IQR → upper boundary → add the final amount.',
+      approach:`IQR = ${q3} − ${q1} = ${iqr}. Upper boundary = ${q3} + 1.5 × ${iqr} = ${fmt(upper)}. Therefore x = ${fmt(upper)} + ${c} = <b>${fmt(x)}</b>.`,
+      habit:'For nested rules, calculate in the exact order written. One clean line per stage.',
+      trap:'Do not add the extra ${c} until after the outlier boundary is complete.'};
+  }
+
+  const generators={spot:genSpot,range:genRange,mean:genMean,median:genMedian,iqr:genIQR,compare:genCompare,algebra:genAlgebra};
+
+  function chooseSkill(){
+    if(session.mode==='hard') return pick(['iqr','compare','algebra','mean']);
+    // Soft curriculum ramp for the first 7, then adaptive weighting.
+    const ramp=['spot','range','mean','median','compare','iqr','algebra'];
+    if(session.index<7) return ramp[session.index];
+    const bag=[];
+    for(const k of Object.keys(skills)){
+      const m=state.mastery[k]||0;
+      const weight=Math.max(1,6-m);
+      for(let i=0;i<weight;i++) bag.push(k);
+    }
+    return pick(bag);
+  }
+
+  function newQuestion(){
+    session.checked=false;
+    const skill=chooseSkill();
+    session.current=generators[skill]();
+    renderQuestion();
+  }
+
+  function renderQuestion(){
+    const q=session.current;
+    $('#sessionLabel').textContent=`Question ${session.index+1} of ${SESSION_LENGTH}`;
+    $('#qno').textContent=`Question ${session.index+1}`;
+    $('#levelLabel').textContent = q.diff.includes('9') ? 'Stretch' : q.diff.includes('7')||q.diff.includes('8') ? 'Level 3' : q.diff.includes('6') ? 'Level 2' : 'Level 1';
+    $('#progressBar').style.width=`${(session.index/SESSION_LENGTH)*100}%`;
+    $('#skillPill').textContent=skills[q.skill].name;
+    $('#difficultyPill').textContent=q.diff;
+    $('#marksPill').textContent=`${q.marks} mark${q.marks===1?'':'s'}`;
+    $('#questionText').innerHTML=q.text;
+    $('#visual').innerHTML=q.visual||'';
+    $('#hintBox').className='hint';
+    $('#hintBox').innerHTML=`<b>Hint:</b> ${q.hint}`;
+    $('#feedback').className='feedback';
+    $('#feedback').innerHTML='';
+    $('#checkBtn').disabled=false;
+    $('#nextBtn').disabled=true;
+    $('#hintBtn').disabled=false;
+    $('#hintBtn').textContent='Hint';
+
+    if(q.type==='number'){
+      $('#answerArea').innerHTML=`<div class="inputRow"><input id="numAnswer" type="text" inputmode="decimal" autocomplete="off" aria-label="Your answer" placeholder="Your answer"><span class="unit">${q.unit||''}</span></div>`;
+      setTimeout(()=>$('#numAnswer')?.focus(),30);
+    } else {
+      $('#answerArea').innerHTML=`<div class="choices">${q.choices.map((c,i)=>`<label class="choice"><input type="radio" name="choice" value="${i}"><span>${c}</span></label>`).join('')}</div>`;
+    }
+  }
+
+  function getResponse(){
+    const q=session.current;
+    if(q.type==='number'){
+      const raw=$('#numAnswer').value.trim().replace(/,/g,'');
+      if(raw==='') return {empty:true};
+      const val=Number(raw);
+      if(Number.isNaN(val)) return {empty:true};
+      return {value:val, correct:eq(val,q.answer,q.tolerance||1e-9), shown:raw};
+    }
+    const el=document.querySelector('input[name="choice"]:checked');
+    if(!el) return {empty:true};
+    const val=Number(el.value);
+    return {value:val, correct:val===q.answerIndex, shown:q.choices[val]};
+  }
+
+  function check(){
+    if(session.checked){ next(); return; }
+    const r=getResponse();
+    if(r.empty){
+      $('#answerArea').animate?.([{transform:'translateX(-5px)'},{transform:'translateX(5px)'},{transform:'translateX(0)'}],{duration:180});
+      return;
+    }
+    session.checked=true;
+    const q=session.current;
+    session.attempted++;
+    state.totalAttempted=(state.totalAttempted||0)+1;
+    let title;
+    if(r.correct){
+      session.correct++; session.streak++; state.totalCorrect=(state.totalCorrect||0)+1;
+      state.mastery[q.skill]=Math.min(5,(state.mastery[q.skill]||0)+1);
+      title='Correct — lock in the method';
+    }else{
+      session.streak=0;
+      state.mastery[q.skill]=Math.max(0,(state.mastery[q.skill]||0)-1);
+      title='Not this time — use the repeatable method';
+    }
+    saveState();
+    session.responses.push({skill:q.skill,correct:r.correct});
+    const ans=q.type==='choice' ? q.choices[q.answerIndex] : `${fmt(q.answer)}${q.unit||''}`;
+    $('#feedback').className=`feedback ${r.correct?'good':'bad'}`;
+    $('#feedback').innerHTML=`
+      <h3>${title}</h3>
+      ${r.correct?'':`<p><b>Correct answer:</b> ${ans}</p>`}
+      <div class="coach">
+        <p><b>Approach</b><br>${q.approach}</p>
+        <p><b>Make it automatic</b><br>${q.habit}</p>
+        <p><b>Trap to avoid</b><br>${q.trap}</p>
+      </div>`;
+    $('#checkBtn').disabled=true;
+    $('#nextBtn').disabled=false;
+    $('#hintBtn').disabled=true;
+    updateSidebar();
+    $('#nextBtn').focus();
+  }
+
+  function next(){
+    if(!session.checked) return check();
+    session.index++;
+    if(session.index>=SESSION_LENGTH){ finish(); return; }
+    newQuestion();
+  }
+
+  function finish(){
+    $('#practiceView').style.display='none';
+    $('#reportView').classList.add('show');
+    $('#progressBar').style.width='100%';
+    const pct=Math.round(100*session.correct/Math.max(1,session.attempted));
+    const secure=Object.values(state.mastery).filter(x=>x>=4).length;
+    $('#reportTitle').textContent = pct>=85 ? 'Mastery session complete' : 'Session complete — now target the weak spots';
+    $('#reportSummary').textContent=`You scored ${session.correct}/${session.attempted} (${pct}%). ${secure} of 7 skills are currently secure.`;
+    const bySkill={}; Object.keys(skills).forEach(k=>bySkill[k]=[0,0]);
+    session.responses.forEach(r=>{bySkill[r.skill][1]++; if(r.correct)bySkill[r.skill][0]++;});
+    $('#reportBox').innerHTML=Object.keys(skills).map(k=>{
+      const [c,n]=bySkill[k]; const mastery=state.mastery[k]||0;
+      const note=n===0?'Not seen this session':`${c}/${n} correct this session`;
+      return `<div class="reportLine"><div><b>${skills[k].name}</b><div class="tiny">${note}</div></div><div><b>${mastery}/5</b></div></div>`;
+    }).join('') + `<div style="margin-top:14px"><b>Automatic-method checklist</b><div class="tiny" style="margin-top:6px">Outlier: cluster → gap. Range: max − min. Mean: mean × count = total. Robust statistics: median + IQR. Comparison: median = typical; smaller IQR = more consistent. Formal rule: IQR first, then boundaries.</div></div>`;
+    updateSidebar();
+  }
+
+  function restart(){
+    session={index:0,correct:0,attempted:0,streak:0,mode:session.mode,used:[],current:null,checked:false,responses:[]};
+    $('#practiceView').style.display='block';
+    $('#reportView').classList.remove('show');
+    newQuestion(); updateSidebar();
+  }
+
+  function updateSidebar(){
+    $('#scoreN').textContent=session.correct;
+    $('#streakN').textContent=session.streak;
+    $('#accuracyN').textContent=session.attempted?`${Math.round(session.correct/session.attempted*100)}%`:'—';
+    const secure=Object.values(state.mastery).filter(v=>v>=4).length;
+    $('#masteredN').textContent=`${secure}/7`;
+    $('#mastery').innerHTML=Object.keys(skills).map(k=>{
+      const m=state.mastery[k]||0;
+      return `<div class="skill"><div class="skillTop"><span>${skills[k].short}</span><span>${m}/5</span></div><div class="mini"><div style="width:${m*20}%"></div></div></div>`;
+    }).join('');
+  }
+
+  $('#checkBtn').addEventListener('click',check);
+  $('#nextBtn').addEventListener('click',next);
+  $('#hintBtn').addEventListener('click',()=>{$('#hintBox').classList.add('show');$('#hintBtn').textContent='Hint shown';});
+  $('#restartBtn').addEventListener('click',restart);
+  $('#adaptiveBtn').addEventListener('click',()=>{session.mode='adaptive';$('#adaptiveBtn').className='active';$('#hardBtn').className='secondary';restart();});
+  $('#hardBtn').addEventListener('click',()=>{session.mode='hard';$('#hardBtn').className='active';$('#adaptiveBtn').className='secondary';restart();});
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Enter' && !$('#reportView').classList.contains('show')){
+      e.preventDefault(); session.checked?next():check();
+    }
+  });
+
+  updateSidebar();
+  newQuestion();
+})();
+</script>
+<a id="pennine-library-return" href="index.html" aria-label="Return to the topic library">← Topic library</a>
+</body>
+</html>

@@ -1,0 +1,580 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>THE INSPECTOR'S DESK — An Inspector Calls Revision</title>
+  <meta name="description" content="A self-contained revision desk for J.B. Priestley's An Inspector Calls.">
+  <style>
+    :root {
+      --ink: #172025;
+      --ink-2: #26343a;
+      --muted: #6f7a7d;
+      --paper: #f5f1e9;
+      --paper-2: #fbfaf7;
+      --line: #ded9cf;
+      --amber: #e4a64b;
+      --amber-2: #f4c97b;
+      --red: #b94f43;
+      --red-2: #f3d4cb;
+      --sage: #6d8f81;
+      --blue: #4d6f83;
+      --shadow: 0 18px 50px rgba(23,32,37,.10);
+      --shadow-sm: 0 7px 22px rgba(23,32,37,.08);
+      --radius: 18px;
+      --radius-sm: 12px;
+      --sidebar: 258px;
+      --serif: Georgia, 'Times New Roman', serif;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.55;
+    }
+    button, input, textarea, select { font: inherit; }
+    button { cursor: pointer; }
+    ::selection { background: var(--amber-2); color: var(--ink); }
+    .app-shell { min-height: 100vh; display: grid; grid-template-columns: var(--sidebar) minmax(0, 1fr); }
+    .sidebar {
+      position: sticky; top: 0; height: 100vh; overflow-y: auto;
+      background: var(--ink); color: #edf0eb; padding: 24px 16px 18px;
+      display: flex; flex-direction: column; z-index: 10;
+    }
+    .brand { padding: 5px 10px 25px; display: flex; gap: 11px; align-items: center; }
+    .brand-mark { width: 38px; height: 38px; border: 1px solid rgba(244,201,123,.6); border-radius: 12px; display: grid; place-items: center; color: var(--amber-2); background: rgba(228,166,75,.13); }
+    .brand-mark svg { width: 23px; height: 23px; }
+    .brand-title { font-size: 13px; line-height: 1.1; letter-spacing: .13em; font-weight: 800; }
+    .brand-sub { display: block; color: #97a5a4; letter-spacing: .04em; font-size: 10px; margin-top: 4px; }
+    .nav-label { padding: 0 11px 8px; color: #78888b; letter-spacing: .13em; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+    .nav { display: grid; gap: 4px; }
+    .nav button {
+      border: 0; background: transparent; color: #bac4c2; text-align: left;
+      display: flex; align-items: center; gap: 11px; padding: 11px 12px; border-radius: 11px;
+      transition: .18s ease; font-weight: 650; font-size: 13px;
+    }
+    .nav button:hover { color: #fff; background: rgba(255,255,255,.07); transform: translateX(2px); }
+    .nav button.active { background: var(--amber); color: var(--ink); box-shadow: 0 8px 20px rgba(228,166,75,.18); }
+    .nav-icon { width: 20px; height: 20px; opacity: .85; display: grid; place-items: center; font-size: 15px; }
+    .sidebar-spacer { flex: 1; }
+    .sidebar-card { margin: 20px 5px 4px; padding: 15px; border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.045); border-radius: 14px; }
+    .sidebar-card .eyebrow { color: var(--amber-2); }
+    .sidebar-card p { color: #b8c1be; font-size: 12px; line-height: 1.45; margin: 7px 0 0; }
+    .sidebar-foot { padding: 17px 10px 0; color: #738184; font-size: 10px; line-height: 1.45; }
+    .main { min-width: 0; padding: 0 36px 60px; }
+    .topbar { height: 82px; display: flex; align-items: center; justify-content: space-between; gap: 18px; position: sticky; top: 0; z-index: 6; background: rgba(245,241,233,.9); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(222,217,207,.7); }
+    .crumb { color: var(--muted); font-size: 12px; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+    .crumb strong { color: var(--ink); }
+    .top-actions { display: flex; align-items: center; gap: 9px; }
+    .search-wrap { position: relative; }
+    .search { width: min(300px, 28vw); padding: 10px 13px 10px 36px; border: 1px solid var(--line); background: rgba(255,255,255,.7); border-radius: 999px; outline: none; color: var(--ink); transition: .2s; }
+    .search:focus { border-color: var(--amber); box-shadow: 0 0 0 4px rgba(228,166,75,.13); }
+    .search-icon { position: absolute; left: 13px; top: 10px; color: var(--muted); pointer-events: none; font-size: 15px; }
+    .search-panel { display: none; position: absolute; top: 47px; right: 0; width: min(360px, 76vw); background: var(--paper-2); border: 1px solid var(--line); border-radius: 14px; padding: 7px; box-shadow: var(--shadow); z-index: 20; }
+    .search-panel.open { display: block; }
+    .search-result { display: block; width: 100%; text-align: left; border: 0; background: transparent; padding: 10px; border-radius: 10px; color: var(--ink); }
+    .search-result:hover { background: #f1eadb; }
+    .search-result small { display: block; color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .08em; }
+    .search-result b { display: block; margin-top: 2px; font-size: 13px; }
+    .icon-btn, .ghost-btn, .primary-btn, .danger-btn { border: 1px solid var(--line); background: var(--paper-2); color: var(--ink); border-radius: 10px; padding: 9px 12px; font-weight: 750; font-size: 12px; transition: .18s ease; }
+    .icon-btn { width: 38px; height: 38px; padding: 0; display: grid; place-items: center; }
+    .icon-btn:hover, .ghost-btn:hover { border-color: var(--amber); transform: translateY(-1px); }
+    .primary-btn { background: var(--ink); border-color: var(--ink); color: #fff; }
+    .primary-btn:hover { background: #31434a; transform: translateY(-1px); }
+    .danger-btn { color: var(--red); border-color: #e9c0b6; background: #fff8f5; }
+    .eyebrow { font-size: 10px; text-transform: uppercase; letter-spacing: .15em; font-weight: 850; color: var(--red); }
+    .view { max-width: 1320px; margin: 0 auto; padding-top: 34px; display: none; animation: fadeUp .3s ease both; }
+    .view.active { display: block; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    h1, h2, h3, h4, p { margin-top: 0; }
+    h1, h2, h3 { letter-spacing: -.03em; }
+    h1 { font-size: clamp(34px, 4.8vw, 66px); line-height: .99; margin-bottom: 18px; font-family: var(--serif); font-weight: 600; }
+    h2 { font-size: clamp(25px, 3vw, 38px); line-height: 1.08; margin-bottom: 11px; font-family: var(--serif); font-weight: 600; }
+    h3 { font-size: 18px; line-height: 1.2; margin-bottom: 7px; }
+    .lede { color: #596466; max-width: 700px; font-size: 16px; line-height: 1.65; }
+    .muted { color: var(--muted); }
+    .rule-title { display: flex; align-items: center; gap: 13px; margin: 38px 0 15px; }
+    .rule-title:after { content: ''; height: 1px; flex: 1; background: var(--line); }
+    .rule-title h3 { margin: 0; white-space: nowrap; font-size: 13px; text-transform: uppercase; letter-spacing: .12em; color: #596466; }
+    .hero { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(260px, .7fr); gap: 18px; align-items: stretch; }
+    .hero-copy { background: var(--ink); color: #f5f1e9; border-radius: var(--radius); padding: clamp(27px, 5vw, 55px); position: relative; overflow: hidden; min-height: 337px; display: flex; flex-direction: column; justify-content: center; }
+    .hero-copy:before { content: ''; position: absolute; width: 350px; height: 350px; border: 1px solid rgba(244,201,123,.28); border-radius: 50%; right: -105px; top: -100px; box-shadow: 0 0 0 22px rgba(244,201,123,.04), 0 0 0 45px rgba(244,201,123,.025); }
+    .hero-copy:after { content: ''; position: absolute; width: 9px; height: 9px; border-radius: 50%; background: var(--amber-2); right: 126px; top: 92px; box-shadow: -55px 48px 0 rgba(244,201,123,.65), 52px 82px 0 rgba(244,201,123,.35), -22px 116px 0 rgba(244,201,123,.45); }
+    .hero-copy > * { position: relative; z-index: 1; }
+    .hero-copy .eyebrow { color: var(--amber-2); }
+    .hero-copy h1 { max-width: 680px; color: #fffdf8; }
+    .hero-copy p { max-width: 640px; color: #bfcbc7; margin-bottom: 24px; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 9px; }
+    .hero-actions .primary-btn { background: var(--amber); color: var(--ink); border-color: var(--amber); }
+    .hero-actions .ghost-btn { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.2); color: #f4f5ef; }
+    .progress-card { background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm); }
+    .progress-top { display: flex; justify-content: space-between; gap: 12px; align-items: start; }
+    .progress-ring { --progress: 0%; width: 145px; height: 145px; border-radius: 50%; display: grid; place-items: center; background: conic-gradient(var(--amber) var(--progress), #ebe6dc 0); position: relative; margin: 11px auto 2px; }
+    .progress-ring:before { content: ''; position: absolute; inset: 10px; background: var(--paper-2); border-radius: 50%; }
+    .progress-ring > div { position: relative; text-align: center; line-height: 1.1; }
+    .progress-ring strong { display: block; font-size: 29px; font-family: var(--serif); }
+    .progress-ring span { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .08em; }
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 11px; margin-top: 17px; }
+    .stat { background: var(--paper-2); border: 1px solid var(--line); padding: 16px 17px; border-radius: 14px; }
+    .stat-num { display: block; font-size: 27px; font-family: var(--serif); line-height: 1; margin-bottom: 6px; }
+    .stat-label { color: var(--muted); font-size: 11px; }
+    .mission-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 13px; }
+    .mission { text-align: left; border: 1px solid var(--line); background: var(--paper-2); border-radius: 15px; padding: 20px; transition: .2s; position: relative; overflow: hidden; }
+    .mission:hover { transform: translateY(-3px); border-color: var(--amber); box-shadow: var(--shadow-sm); }
+    .mission .mission-icon { width: 35px; height: 35px; display: grid; place-items: center; border-radius: 10px; background: #f5e4c7; color: #855b22; margin-bottom: 16px; font-size: 17px; }
+    .mission p { color: var(--muted); font-size: 12px; margin-bottom: 14px; }
+    .mission-link { color: var(--red); font-size: 12px; font-weight: 800; }
+    .board { background: #eee8dc; border: 1px solid #ded5c5; padding: 22px; border-radius: var(--radius); overflow: hidden; position: relative; }
+    .board:before { content: ''; position: absolute; inset: 0; opacity: .22; background-image: radial-gradient(#8e806f 1px, transparent 1px); background-size: 16px 16px; pointer-events: none; }
+    .board-inner { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; align-items: center; }
+    .board-node { background: var(--paper-2); border: 1px solid #d9d0c2; border-radius: 13px; padding: 14px; box-shadow: 0 5px 12px rgba(80,64,40,.08); }
+    .board-node strong { display: block; font-family: var(--serif); font-size: 18px; }
+    .board-node small { color: var(--muted); font-size: 11px; }
+    .board-node.center { background: var(--ink); color: white; border-color: var(--ink); text-align: center; grid-column: 2; grid-row: 1 / span 2; padding: 22px 12px; }
+    .board-node.center strong { color: var(--amber-2); font-size: 25px; }
+    .board-node.center small { color: #bec7c4; }
+    .board-node.left-1 { grid-column: 1; grid-row: 1; }
+    .board-node.left-2 { grid-column: 1; grid-row: 2; }
+    .board-node.right-1 { grid-column: 3; grid-row: 1; }
+    .board-node.right-2 { grid-column: 3; grid-row: 2; }
+    .micro-note { color: #667174; font-size: 12px; }
+    .two-col { display: grid; grid-template-columns: 1.12fr .88fr; gap: 17px; }
+    .panel { background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; }
+    .callout { border-left: 3px solid var(--amber); background: #faf3e5; border-radius: 0 12px 12px 0; padding: 15px 17px; color: #4e5553; font-size: 13px; }
+    .quote-large { font-family: var(--serif); font-size: clamp(24px, 3vw, 34px); line-height: 1.15; color: var(--ink); margin: 14px 0; }
+    .quote-mark { color: var(--red); font-family: var(--serif); font-size: 50px; line-height: .4; vertical-align: -12px; margin-right: 4px; }
+    .tag-row { display: flex; gap: 6px; flex-wrap: wrap; }
+    .tag { display: inline-flex; align-items: center; border-radius: 999px; padding: 4px 8px; background: #edf0ed; color: #557067; font-size: 10px; font-weight: 800; letter-spacing: .02em; }
+    .tag.red { background: #f7e1dc; color: #974c40; }
+    .tag.amber { background: #f7e9cc; color: #946a2f; }
+    .tag.blue { background: #dfeaf0; color: #4b6b7c; }
+    .timeline { position: relative; margin: 25px 0; padding-left: 28px; }
+    .timeline:before { content: ''; position: absolute; top: 4px; bottom: 4px; left: 8px; width: 2px; background: #d9cfbf; }
+    .timeline-item { position: relative; padding: 0 0 25px 18px; }
+    .timeline-item:last-child { padding-bottom: 0; }
+    .timeline-dot { width: 12px; height: 12px; position: absolute; left: -25px; top: 5px; border-radius: 50%; background: var(--amber); border: 3px solid var(--paper-2); box-shadow: 0 0 0 1px var(--amber); }
+    .timeline-item h3 { font-size: 17px; margin-bottom: 3px; }
+    .timeline-item .time { color: var(--red); font-size: 10px; font-weight: 850; text-transform: uppercase; letter-spacing: .13em; }
+    .timeline-item p { color: var(--muted); font-size: 13px; margin-bottom: 0; }
+    .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .compare-card { padding: 18px; border-radius: 14px; background: #f4eee1; border: 1px solid #e5daca; }
+    .compare-card.after { background: #eaf0ee; border-color: #d4e0dc; }
+    .compare-card h3 { font-family: var(--serif); font-size: 22px; }
+    .compare-card ul, .clean-list { margin: 8px 0 0; padding-left: 18px; color: var(--muted); font-size: 13px; }
+    .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin: 20px 0 15px; }
+    .filter { border: 1px solid var(--line); color: #667174; background: rgba(255,255,255,.5); border-radius: 999px; padding: 7px 11px; font-size: 11px; font-weight: 800; transition: .18s; }
+    .filter:hover, .filter.active { background: var(--ink); color: white; border-color: var(--ink); }
+    .character-grid, .theme-grid, .quote-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .character-card, .theme-card, .quote-card { background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; transition: .2s; }
+    .character-card:hover, .theme-card:hover, .quote-card:hover { border-color: #d0ad70; box-shadow: var(--shadow-sm); transform: translateY(-2px); }
+    .character-head { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; }
+    .avatar { width: 43px; height: 43px; flex: 0 0 auto; border-radius: 13px; display: grid; place-items: center; color: white; font-family: var(--serif); font-size: 21px; background: var(--ink); }
+    .avatar.warm { background: var(--red); } .avatar.sage { background: var(--sage); } .avatar.blue { background: var(--blue); } .avatar.gold { background: #aa7a32; }
+    .character-card h3 { margin-bottom: 1px; }
+    .role { color: var(--muted); font-size: 11px; }
+    .character-card .mini-quote { font-family: var(--serif); font-size: 18px; line-height: 1.2; margin: 17px 0 13px; }
+    .character-card p { color: var(--muted); font-size: 13px; margin-bottom: 13px; }
+    .change-bar { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 12px; }
+    .change-bar small { display: flex; justify-content: space-between; color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .08em; }
+    .meter { height: 5px; background: #ece8df; border-radius: 9px; overflow: hidden; margin-top: 7px; }
+    .meter span { display: block; height: 100%; border-radius: inherit; background: var(--amber); }
+    .theme-card { padding: 21px; }
+    .theme-top { display: flex; justify-content: space-between; align-items: start; gap: 10px; }
+    .theme-number { color: #c9bda9; font-family: var(--serif); font-size: 29px; line-height: 1; }
+    .theme-card p { color: var(--muted); font-size: 13px; min-height: 63px; }
+    .theme-card .theme-hook { padding: 11px 12px; border-radius: 10px; background: #f4eee1; font-size: 12px; color: #5d5c56; }
+    .quote-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .quote-count { color: var(--muted); font-size: 12px; }
+    .quote-card { padding: 17px; cursor: pointer; }
+    .quote-card.selected { border-color: var(--amber); box-shadow: 0 0 0 3px rgba(228,166,75,.16); }
+    .quote-card .quote-text { font-family: var(--serif); font-size: 20px; line-height: 1.18; margin: 13px 0 12px; }
+    .quote-card .speaker { color: var(--red); font-size: 11px; font-weight: 850; }
+    .quote-analysis { display: none; border-top: 1px solid var(--line); margin-top: 14px; padding-top: 13px; color: #5e6869; font-size: 12px; }
+    .quote-card.selected .quote-analysis { display: block; animation: fadeUp .2s ease both; }
+    .quote-analysis b { color: var(--ink); }
+    .quote-analysis p { margin-bottom: 9px; }
+    .flash-layout { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 17px; align-items: start; }
+    .flash-main { min-width: 0; }
+    .flash-controls { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin: 18px 0; }
+    .flash-select { background: var(--paper-2); border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px; color: var(--ink); }
+    .flashcard-wrap { perspective: 1200px; }
+    .flashcard { min-height: 360px; position: relative; transform-style: preserve-3d; transition: transform .55s cubic-bezier(.2,.8,.2,1); cursor: pointer; }
+    .flashcard.flipped { transform: rotateY(180deg); }
+    .flash-face { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 20px; border: 1px solid var(--line); padding: clamp(24px, 6vw, 60px); display: flex; flex-direction: column; justify-content: center; overflow: hidden; }
+    .flash-front { background: var(--ink); color: white; }
+    .flash-front:after { content: '?'; position: absolute; right: 36px; bottom: -43px; color: rgba(244,201,123,.14); font-family: var(--serif); font-size: 240px; line-height: 1; }
+    .flash-back { background: var(--paper-2); transform: rotateY(180deg); }
+    .flash-face > * { position: relative; z-index: 1; }
+    .flash-front .eyebrow { color: var(--amber-2); }
+    .flash-front h2 { color: #fff; max-width: 760px; font-size: clamp(27px, 4vw, 44px); }
+    .flash-front .hint { color: #b4c0bc; font-size: 12px; margin-top: 16px; }
+    .flash-back h2 { font-size: 27px; }
+    .answer-box { border-left: 3px solid var(--amber); padding-left: 14px; color: #566163; max-width: 820px; }
+    .flash-actions { display: flex; justify-content: center; gap: 9px; margin-top: 15px; }
+    .flash-actions button { min-width: 120px; }
+    .again { background: #fff7f4; border-color: #edc6ba; color: var(--red); }
+    .know { background: #eef4f0; border-color: #c8d9d0; color: #456e5c; }
+    .queue-panel { background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 19px; }
+    .queue-panel h3 { font-family: var(--serif); font-size: 22px; }
+    .queue-stat { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin: 11px 0 6px; }
+    .queue-bar { height: 7px; background: #ebe6dc; border-radius: 20px; overflow: hidden; }
+    .queue-bar span { height: 100%; display: block; background: var(--amber); transition: width .3s; }
+    .shortcut { margin-top: 20px; border-top: 1px solid var(--line); padding-top: 14px; display: grid; gap: 8px; font-size: 11px; color: var(--muted); }
+    kbd { font-family: var(--sans); color: var(--ink); background: #eee9df; border: 1px solid #dad1c2; padding: 2px 6px; border-radius: 5px; font-weight: 800; margin-right: 5px; }
+    .exam-layout { display: grid; grid-template-columns: 310px minmax(0,1fr); gap: 17px; align-items: start; }
+    .question-list { display: grid; gap: 7px; }
+    .question-btn { text-align: left; border: 1px solid var(--line); border-radius: 12px; padding: 13px; background: var(--paper-2); color: var(--ink); transition: .18s; }
+    .question-btn:hover { border-color: var(--amber); }
+    .question-btn.active { border-color: var(--ink); background: var(--ink); color: white; }
+    .question-btn small { display: block; color: var(--red); font-size: 10px; text-transform: uppercase; letter-spacing: .1em; font-weight: 850; margin-bottom: 4px; }
+    .question-btn.active small { color: var(--amber-2); }
+    .question-btn span { font-size: 12px; line-height: 1.3; display: block; }
+    .exam-card { min-height: 500px; }
+    .exam-prompt { font-family: var(--serif); font-size: clamp(23px, 3vw, 35px); line-height: 1.12; max-width: 820px; margin: 15px 0 22px; }
+    .thesis { background: #f5ead4; border: 1px solid #ead7b5; padding: 15px; border-radius: 12px; margin-bottom: 18px; color: #5d5343; }
+    .thesis b { color: #8e632c; font-size: 10px; text-transform: uppercase; letter-spacing: .1em; display: block; margin-bottom: 4px; }
+    .model-answer { display: none; }
+    .model-answer.visible { display: block; animation: fadeUp .25s ease both; }
+    .answer-label { color: var(--red); font-size: 10px; font-weight: 850; text-transform: uppercase; letter-spacing: .13em; margin-bottom: 10px; }
+    .answer-copy { color: #4d5a5d; font-size: 14px; line-height: 1.72; }
+    .answer-copy em { color: var(--ink); font-weight: 700; font-style: normal; }
+    .move-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-top: 20px; }
+    .move { padding: 10px; border-radius: 10px; background: #f1eee7; font-size: 11px; color: var(--muted); }
+    .move strong { display: block; color: var(--ink); font-size: 11px; margin-bottom: 3px; }
+    .score-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; border-top: 1px solid var(--line); margin-top: 23px; padding-top: 14px; }
+    .score-row span { color: var(--muted); font-size: 11px; margin-right: 4px; }
+    .score { width: 28px; height: 28px; padding: 0; border-radius: 50%; }
+    .architect { margin-top: 17px; }
+    .architect-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+    .field label { display: block; color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .1em; font-weight: 800; margin-bottom: 5px; }
+    .field select, .field input, .field textarea { width: 100%; border: 1px solid var(--line); border-radius: 9px; background: var(--paper-2); padding: 9px 10px; color: var(--ink); outline: none; }
+    .field select:focus, .field input:focus, .field textarea:focus { border-color: var(--amber); }
+    .architect-output { margin-top: 13px; display: grid; gap: 8px; }
+    .output-chip { border: 1px dashed #d5c9b8; background: #fbf7ee; border-radius: 11px; padding: 12px; font-size: 12px; color: #5a625e; }
+    .output-chip b { display: block; color: #976b2f; font-size: 10px; text-transform: uppercase; letter-spacing: .09em; margin-bottom: 3px; }
+    .context-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+    .context-card { background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 21px; }
+    .context-card .context-icon { font-size: 24px; margin-bottom: 14px; }
+    .context-card p, .context-card li { color: var(--muted); font-size: 13px; }
+    .fact-strip { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin: 18px 0; }
+    .fact { border-left: 3px solid var(--amber); background: var(--paper-2); border-radius: 0 12px 12px 0; padding: 13px 14px; }
+    .fact strong { display: block; font-family: var(--serif); font-size: 21px; line-height: 1; margin-bottom: 5px; }
+    .fact span { color: var(--muted); font-size: 11px; }
+    .notes { width: 100%; min-height: 140px; resize: vertical; border: 1px solid var(--line); background: #fffdf8; border-radius: 12px; padding: 13px; outline: none; color: var(--ink); }
+    .notes:focus { border-color: var(--amber); box-shadow: 0 0 0 3px rgba(228,166,75,.12); }
+    .empty { border: 1px dashed #cfc5b6; background: rgba(255,255,255,.4); border-radius: 14px; padding: 24px; color: var(--muted); text-align: center; grid-column: 1/-1; }
+    .toast { position: fixed; right: 25px; bottom: 24px; background: var(--ink); color: #fff; border-radius: 11px; padding: 12px 16px; box-shadow: var(--shadow); font-size: 12px; transform: translateY(20px); opacity: 0; pointer-events: none; transition: .25s; z-index: 30; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    @media (max-width: 1100px) { .hero, .two-col { grid-template-columns: 1fr; } .character-grid, .theme-grid, .quote-grid { grid-template-columns: repeat(2,1fr); } .context-grid { grid-template-columns: repeat(2,1fr); } .flash-layout { grid-template-columns: 1fr; } .queue-panel { order: -1; } }
+    @media (max-width: 780px) {
+      :root { --sidebar: 0px; }
+      .app-shell { display: block; }
+      .sidebar { position: fixed; left: 0; right: 0; bottom: 0; top: auto; height: auto; padding: 6px 8px 7px; border-top: 1px solid rgba(255,255,255,.12); flex-direction: row; align-items: center; overflow: visible; z-index: 50; }
+      .brand, .nav-label, .sidebar-spacer, .sidebar-card, .sidebar-foot { display: none; }
+      .nav { display: flex; width: 100%; justify-content: space-between; gap: 2px; }
+      .nav button { flex: 1; padding: 8px 4px; gap: 3px; flex-direction: column; font-size: 9px; line-height: 1.1; text-align: center; border-radius: 8px; }
+      .nav-icon { height: 18px; font-size: 14px; }
+      .main { padding: 0 15px 75px; }
+      .topbar { height: 66px; gap: 7px; }
+      .crumb { font-size: 10px; max-width: 34vw; overflow: hidden; text-overflow: ellipsis; }
+      .search { width: 145px; font-size: 11px; padding-left: 29px; }
+      .search-icon { left: 10px; top: 10px; }
+      .top-actions .icon-btn { display: none; }
+      .view { padding-top: 25px; }
+      h1 { font-size: 39px; } h2 { font-size: 30px; }
+      .hero-copy { min-height: 390px; padding: 26px; }
+      .stats { grid-template-columns: repeat(2,1fr); }
+      .mission-grid, .character-grid, .theme-grid, .quote-grid, .context-grid { grid-template-columns: 1fr; }
+      .compare, .fact-strip { grid-template-columns: 1fr 1fr; }
+      .exam-layout { grid-template-columns: 1fr; }
+      .question-list { grid-template-columns: repeat(2,1fr); }
+      .exam-card { min-height: 0; }
+      .move-grid { grid-template-columns: repeat(2,1fr); }
+      .architect-grid { grid-template-columns: 1fr; }
+      .board-inner { grid-template-columns: 1fr 1fr; }
+      .board-node.center { grid-column: 1 / -1; grid-row: auto; order: -1; }
+      .board-node.left-1, .board-node.left-2, .board-node.right-1, .board-node.right-2 { grid-column: auto; grid-row: auto; }
+    }
+  </style>
+<link rel="stylesheet" href="../../assets/activity.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M7 3h10M9 3v5l-4 9.5A2.4 2.4 0 0 0 7.2 21h9.6a2.4 2.4 0 0 0 2.2-3.5L15 8V3M8 13h8M10 8h4"/><path d="M12 1v2"/></svg></div>
+        <div><div class="brand-title">THE INSPECTOR'S<br>DESK</div><span class="brand-sub">AN INSPECTOR CALLS · REVISION</span></div>
+      </div>
+      <div class="nav-label">Your case file</div>
+      <nav class="nav" aria-label="Main navigation">
+        <button class="active" data-view="home"><span class="nav-icon">⌂</span>Command centre</button>
+        <button data-view="story"><span class="nav-icon">◈</span>Story map</button>
+        <button data-view="characters"><span class="nav-icon">♙</span>Characters</button>
+        <button data-view="themes"><span class="nav-icon">◌</span>Themes</button>
+        <button data-view="quotes"><span class="nav-icon">❝</span>Quote vault</button>
+        <button data-view="flashcards"><span class="nav-icon">▣</span>Flashcards</button>
+        <button data-view="exam"><span class="nav-icon">✎</span>Exam lab</button>
+        <button data-view="context"><span class="nav-icon">⌛</span>Context & author</button>
+      </nav>
+      <div class="sidebar-spacer"></div>
+      <div class="sidebar-card"><div class="eyebrow">Inspector's rule</div><p>Do not just remember what happens. Ask who has power, who pays the price, and what Priestley wants the audience to change.</p></div>
+      <div class="sidebar-foot">Built as a single local file.<br>Your revision progress stays in this browser.</div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="crumb"><span>CASE 1945</span><b>/</b><strong id="crumbTitle">Command centre</strong></div>
+        <div class="top-actions">
+          <div class="search-wrap">
+            <span class="search-icon">⌕</span>
+            <input id="globalSearch" class="search" type="search" placeholder="Search your case file…" autocomplete="off" aria-label="Search your case file">
+            <div id="searchPanel" class="search-panel"></div>
+          </div>
+          <button class="icon-btn" id="themeToggle" title="Toggle warm reading mode" aria-label="Toggle warm reading mode">☼</button>
+          <button class="icon-btn" id="resetProgress" title="Reset revision progress" aria-label="Reset revision progress">↺</button>
+        </div>
+      </header>
+
+      <section class="view active" id="view-home">
+        <div class="hero">
+          <div class="hero-copy">
+            <div class="eyebrow">A revision desk for the unseen fifth character: the audience</div>
+            <h1>The Birlings are on trial. Your job is to think beyond the plot.</h1>
+            <p>Build arguments, interrogate quotations, and connect the private choices of one family to Priestley's public warning about class, power and responsibility.</p>
+            <div class="hero-actions"><button class="primary-btn" data-view="flashcards">Start a 5-minute interrogation →</button><button class="ghost-btn" data-view="exam">Open exam lab</button></div>
+          </div>
+          <div class="progress-card">
+            <div class="progress-top"><div><div class="eyebrow">Your case progress</div><h3 style="margin-top:8px">Keep the evidence moving.</h3></div><span class="tag amber">local save</span></div>
+            <div class="progress-ring" id="progressRing"><div><strong id="progressPct">0%</strong><span>mastery</span></div></div>
+            <div class="micro-note" id="progressMessage">Every remembered connection makes the final answer sharper.</div>
+          </div>
+        </div>
+        <div class="stats">
+          <div class="stat"><span class="stat-num" id="statQuotes">0</span><span class="stat-label">quotes marked secure</span></div>
+          <div class="stat"><span class="stat-num" id="statCards">0</span><span class="stat-label">flashcards mastered</span></div>
+          <div class="stat"><span class="stat-num" id="statEssays">0</span><span class="stat-label">exam questions scored</span></div>
+          <div class="stat"><span class="stat-num" id="statStreak">0</span><span class="stat-label">revision streak (days)</span></div>
+        </div>
+        <div class="rule-title"><h3>Choose your next mission</h3></div>
+        <div class="mission-grid">
+          <button class="mission" data-view="quotes"><div class="mission-icon">❝</div><h3>Build a quote bank</h3><p>Click any quotation to reveal a compact Grade 9 reading: method, meaning, context and links.</p><span class="mission-link">Enter the vault →</span></button>
+          <button class="mission" data-view="flashcards"><div class="mission-icon">▣</div><h3>Interrogate a card</h3><p>Recall first. Reveal second. Mark it again or secure it. The desk keeps your queue in local storage.</p><span class="mission-link">Start recall →</span></button>
+          <button class="mission" data-view="exam"><div class="mission-icon">✎</div><h3>Pressure-test an argument</h3><p>Take a hypothetical character or theme question, then compare your thinking with a concise model route.</p><span class="mission-link">Open the lab →</span></button>
+        </div>
+        <div class="rule-title"><h3>The case at a glance</h3></div>
+        <div class="board"><div class="board-inner">
+          <div class="board-node left-1"><strong>Power</strong><small>class · gender · money</small></div>
+          <div class="board-node left-2"><strong>Choices</strong><small>dismissal · prejudice · exploitation</small></div>
+          <div class="board-node center"><strong>Eva Smith</strong><small>the absent centre of the play</small></div>
+          <div class="board-node right-1"><strong>Consequences</strong><small>guilt · death · social warning</small></div>
+          <div class="board-node right-2"><strong>Change</strong><small>responsibility · generations · hope</small></div>
+        </div></div>
+      </section>
+
+      <section class="view" id="view-story">
+        <div class="eyebrow">The narrative machine</div><h2>Story map: one evening, one family, a widening circle of blame.</h2>
+        <p class="lede">The play is tightly constructed: a comfortable celebration is interrupted, the Inspector reveals a chain of responsibility, and the final phone call makes the structure loop back on itself.</p>
+        <div class="two-col" style="margin-top:24px">
+          <div class="panel"><div class="eyebrow">Plot in three movements</div><div class="timeline">
+            <div class="timeline-item"><span class="timeline-dot"></span><span class="time">Act One · The performance of respectability</span><h3>The party is interrupted</h3><p>Arthur Birling celebrates Sheila's engagement to Gerald Croft. His confident speeches about progress, war and the Titanic establish dramatic irony before Inspector Goole arrives.</p></div>
+            <div class="timeline-item"><span class="timeline-dot"></span><span class="time">Act Two · The chain is exposed</span><h3>One name becomes everyone's problem</h3><p>Goole connects each person to Eva Smith: Birling dismisses her, Sheila has her fired, Gerald keeps her as Daisy Renton, Eric exploits her, and Mrs Birling denies her aid.</p></div>
+            <div class="timeline-item"><span class="timeline-dot"></span><span class="time">Act Three · The lesson is refused</span><h3>The phone rings again</h3><p>Sheila and Eric recognise their responsibility; the older generation and Gerald look for an escape. The final call reports a real death and a real Inspector on the way: the cycle restarts.</p></div>
+          </div></div>
+          <div class="panel"><div class="eyebrow">The dramatic engine</div><div class="quote-large"><span class="quote-mark">“</span>Everything we said had happened really had happened.</div><p class="muted" style="font-size:13px">Sheila's point is not that the Inspector's identity is easy to solve. It is that the moral facts remain true even if the family can wriggle out of legal consequences.</p><div class="callout"><b>Structure move:</b> the ending is cyclical rather than neatly resolved. Priestley turns the audience into witnesses who must decide whether they will learn the lesson.</div></div>
+        </div>
+        <div class="rule-title"><h3>What makes this more than a murder mystery?</h3></div>
+        <div class="context-grid">
+          <div class="context-card"><div class="context-icon">◉</div><h3>Eva never appears</h3><p>Her absence is deliberate. She can represent the many working-class people made invisible by systems that reduce them to categories such as “girls of that class”.</p></div>
+          <div class="context-card"><div class="context-icon">◌</div><h3>Goole is a device</h3><p>He may be read as a moral judge, supernatural presence, or theatrical device. Priestley keeps the mystery open so the message stays central.</p></div>
+          <div class="context-card"><div class="context-icon">↻</div><h3>The ending is a warning</h3><p>The second call echoes the first. If people refuse collective responsibility, society repeats its catastrophes—“fire and blood and anguish”.</p></div>
+        </div>
+      </section>
+
+      <section class="view" id="view-characters">
+        <div class="eyebrow">People under examination</div><h2>Characters: the family, the witness, the absence.</h2>
+        <p class="lede">Treat each character as both a person and an argument. Ask what social force they embody, then track whether Priestley lets them change.</p>
+        <div class="filter-bar" id="characterFilters"><button class="filter active" data-filter="all">All files</button><button class="filter" data-filter="family">The Birlings</button><button class="filter" data-filter="young">Younger generation</button><button class="filter" data-filter="power">Power holders</button><button class="filter" data-filter="outsider">Outside the family</button></div>
+        <div class="character-grid" id="characterGrid"></div>
+        <div class="rule-title"><h3>A useful contrast to memorise</h3></div>
+        <div class="compare"><div class="compare-card"><h3>Older generation</h3><ul><li>Protect status and reputation.</li><li>Prefer individualism and excuses.</li><li>Judge “people like Eva” from above.</li><li>Refuse or minimise the Inspector's lesson.</li></ul></div><div class="compare-card after"><h3>Younger generation</h3><ul><li>Can recognise harm and complicity.</li><li>Are more open to social change.</li><li>Still carry privilege and unresolved flaws.</li><li>Offer Priestley's cautious hope.</li></ul></div></div>
+      </section>
+
+      <section class="view" id="view-themes">
+        <div class="eyebrow">The arguments beneath the dialogue</div><h2>Themes: five lenses, one connected system.</h2>
+        <p class="lede">A high-level answer does not bolt on context. It shows how a theme moves through language, structure and the society Priestley is challenging.</p>
+        <div class="theme-grid" id="themeGrid"></div>
+        <div class="rule-title"><h3>Theme collision lab</h3></div>
+        <div class="panel"><div class="two-col" style="gap:30px;align-items:center"><div><div class="eyebrow">Try this connection</div><h3>Class is never only class.</h3><p class="muted" style="font-size:13px">Eva's vulnerability is intensified by gender; the family's money turns private choices into public consequences; the Inspector's socialism reframes “individual” actions as a collective pattern.</p></div><div class="tag-row" style="justify-content:center;gap:9px"><span class="tag amber">CLASS</span><span style="font-size:20px;color:#b6a993">+</span><span class="tag red">GENDER</span><span style="font-size:20px;color:#b6a993">+</span><span class="tag blue">RESPONSIBILITY</span><span style="font-size:20px;color:#b6a993">=</span><span class="tag">POWER</span></div></div></div>
+      </section>
+
+      <section class="view" id="view-quotes">
+        <div class="eyebrow">Evidence locker</div><h2>Quote vault: small words, large arguments.</h2>
+        <p class="lede">The goal is not to collect the longest quotations. Collect flexible evidence you can use for character, theme, context, form and structure.</p>
+        <div class="quote-toolbar"><div class="filter-bar" id="quoteFilters" style="margin:10px 0"><button class="filter active" data-filter="all">All evidence</button><button class="filter" data-filter="class">Class / money</button><button class="filter" data-filter="responsibility">Responsibility</button><button class="filter" data-filter="gender">Gender / power</button><button class="filter" data-filter="structure">Structure / form</button></div><div class="quote-count" id="quoteCount"></div></div>
+        <div class="quote-grid" id="quoteGrid"></div>
+      </section>
+
+      <section class="view" id="view-flashcards">
+        <div class="eyebrow">Active recall room</div><h2>Flashcards: answer before the evidence appears.</h2>
+        <p class="lede">Click the card to reveal the reverse. Use “Again” honestly: the queue is a better teacher than false confidence.</p>
+        <div class="flash-layout" style="margin-top:23px"><div class="flash-main">
+          <div class="flash-controls"><select class="flash-select" id="flashFilter" aria-label="Filter flashcards"><option value="all">Mixed interrogation</option><option value="quote">Quotation recall</option><option value="character">Character recall</option><option value="context">Context recall</option><option value="theme">Theme recall</option></select><button class="ghost-btn" id="shuffleCards">Shuffle queue ↗</button></div>
+          <div class="flashcard-wrap"><div class="flashcard" id="flashcard"><div class="flash-face flash-front"><div class="eyebrow">Case file <span id="flashIndex">01</span></div><h2 id="flashQuestion">Loading your first question…</h2><div class="hint">Think out loud, then tap to reveal the evidence.</div></div><div class="flash-face flash-back"><div class="eyebrow">Model recall</div><h2 id="flashAnswerTitle">Answer</h2><div class="answer-box" id="flashAnswer"></div><div class="tag-row" id="flashTags" style="margin-top:18px"></div></div></div></div>
+          <div class="flash-actions"><button class="ghost-btn again" id="flashAgain">← Again</button><button class="ghost-btn" id="flashFlip">Reveal answer</button><button class="ghost-btn know" id="flashKnow">Secure it →</button></div>
+        </div><aside class="queue-panel"><div class="eyebrow">Session report</div><h3>How is the memory holding?</h3><div class="queue-stat"><span>Current queue</span><b id="queueCount">0 / 0</b></div><div class="queue-bar"><span id="queueProgress" style="width:0%"></span></div><div class="queue-stat"><span>Marked secure</span><b id="secureCount">0</b></div><div class="queue-bar"><span id="secureProgress" style="width:0%"></span></div><p class="micro-note" style="margin-top:18px">A card returns to the queue when you choose “Again”. Your secure cards are remembered between visits.</p><div class="shortcut"><div><kbd>Space</kbd> flip</div><div><kbd>1</kbd> again <kbd>2</kbd> secure</div><div><kbd>R</kbd> reshuffle</div></div></aside></div>
+        <div class="rule-title"><h3>One-minute debrief</h3></div><div class="panel"><div class="eyebrow">Your own phrasing matters</div><h3>Write the sentence you keep forgetting.</h3><textarea class="notes" id="revisionNotes" placeholder="Example: Priestley makes Birling's confidence collapse through dramatic irony…"></textarea><div class="micro-note" style="margin-top:8px">Autosaved locally — use this as a last-minute “weak spots” sheet.</div></div>
+      </section>
+
+      <section class="view" id="view-exam">
+        <div class="eyebrow">No extract. No excuses. Four choices are yours.</div><h2>Exam lab: turn evidence into an argument.</h2>
+        <p class="lede">Practise the move examiners reward: a clear viewpoint, a precise word-level reading, a structural or contextual connection, and a judgement about Priestley's purpose.</p>
+        <div class="exam-layout" style="margin-top:23px"><aside class="panel"><div class="eyebrow">Hypotheticals</div><h3 style="margin-top:8px">Choose a question</h3><div class="question-list" id="questionList"></div><button class="primary-btn" style="width:100%;margin-top:12px" id="randomQuestion">Give me a random case ↗</button></aside><div class="panel exam-card"><div class="eyebrow" id="examFocus">Character question</div><div class="exam-prompt" id="examPrompt"></div><div class="thesis"><b>Possible line of argument</b><span id="examThesis"></span></div><button class="primary-btn" id="revealAnswer">Reveal model route</button><div class="model-answer" id="modelAnswer"><div class="answer-label">Model paragraph route</div><div class="answer-copy" id="answerCopy"></div><div class="move-grid" id="moveGrid"></div></div><div class="score-row"><span>How secure is your answer?</span><button class="icon-btn score" data-score="1">1</button><button class="icon-btn score" data-score="2">2</button><button class="icon-btn score" data-score="3">3</button><span id="scoreFeedback" class="muted"></span></div></div></div>
+        <div class="rule-title"><h3>Essay architect</h3></div><div class="panel architect"><div class="two-col" style="align-items:end"><div><div class="eyebrow">Make a plan, not a panic</div><h3>Generate a three-step argument.</h3><p class="muted" style="font-size:13px">Choose a lens and a focus. The desk will give you a thesis, evidence route and Priestley-purpose line to adapt.</p></div><button class="primary-btn" id="generatePlan">Generate my route ↗</button></div><div class="architect-grid" style="margin-top:17px"><div class="field"><label for="planType">Question focus</label><select id="planType"><option value="character">Character</option><option value="theme">Theme</option><option value="structure">Structure</option></select></div><div class="field"><label for="planLens">Lens</label><select id="planLens"><option value="sheila">Sheila's change</option><option value="birling">Mr Birling's capitalism</option><option value="inspector">Inspector Goole</option><option value="responsibility">Social responsibility</option><option value="gender">Gender and power</option></select></div></div><div class="architect-output" id="architectOutput"><div class="output-chip"><b>01 · Position</b>Your generated thesis will appear here.</div><div class="output-chip"><b>02 · Evidence</b>Choose a lens, then let the evidence do the work.</div><div class="output-chip"><b>03 · Purpose</b>Always finish by returning to the audience in 1945.</div></div></div>
+      </section>
+
+      <section class="view" id="view-context">
+        <div class="eyebrow">The world outside the dining room</div><h2>Context & author: 1912 seen through 1945 eyes.</h2>
+        <p class="lede">The time gap is one of Priestley's most powerful tools. The audience knows that Birling's confidence is wrong because the future has already proved it wrong.</p>
+        <div class="fact-strip"><div class="fact"><strong>1945</strong><span>written and first performed</span></div><div class="fact"><strong>1912</strong><span>the action is set here</span></div><div class="fact"><strong>J.B.</strong><span>Priestley · 1894–1984</span></div><div class="fact"><strong>3 acts</strong><span>one continuous evening</span></div></div>
+        <div class="context-grid">
+          <div class="context-card"><div class="context-icon">✒</div><div class="eyebrow">The author</div><h3>J.B. Priestley</h3><p>Priestley was an English writer, dramatist and committed socialist. His experience of the First World War and his concern with inequality inform his belief that society must move away from selfish individualism.</p><div class="callout">Use him as purpose, not decoration: “Priestley presents…” should lead to a specific audience effect.</div></div>
+          <div class="context-card"><div class="context-icon">⌛</div><div class="eyebrow">The setting</div><h3>Britain in 1912</h3><ul class="clean-list"><li>Rigid class divisions separated wealthy industrialists from low-paid workers.</li><li>Employers held major power; workers had fewer protections and little security.</li><li>Women were constrained by patriarchal expectations and had limited economic independence.</li><li>The Titanic and talk of progress make Birling's certainty especially vulnerable to irony.</li></ul></div>
+          <div class="context-card"><div class="context-icon">⚖</div><div class="eyebrow">The moment of writing</div><h3>Britain in 1945</h3><p>After two world wars, audiences had witnessed the consequences of nationalism, hierarchy and social failure. Collective action and public welfare were live political ideas; Priestley uses the play to argue for responsibility and change.</p><div class="callout">A neat context link: 1912's “every man for himself” is tested by a 1945 audience who have learned the cost of isolation.</div></div>
+        </div>
+        <div class="rule-title"><h3>Context timeline</h3></div>
+        <div class="panel"><div class="timeline" style="margin-bottom:0"><div class="timeline-item"><span class="timeline-dot"></span><span class="time">1894</span><h3>Priestley is born</h3><p>His later writing repeatedly examines time, class and the consequences of human choices.</p></div><div class="timeline-item"><span class="timeline-dot"></span><span class="time">1912 · setting</span><h3>The Birlings' evening</h3><p>The action takes place in a world of visible hierarchy, before the shock of the First World War.</p></div><div class="timeline-item"><span class="timeline-dot"></span><span class="time">1914–1918 and 1939–1945</span><h3>Two world wars</h3><p>The future that Birling cannot imagine happens twice. The audience knows his confidence is historically blind.</p></div><div class="timeline-item"><span class="timeline-dot"></span><span class="time">1945 · publication and performance</span><h3>The warning reaches a post-war audience</h3><p>Priestley asks whether people will rebuild society around shared responsibility or repeat the old pattern.</p></div></div></div>
+      </section>
+    </main>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const characters = [
+      {id:'birling', name:'Arthur Birling', initials:'AB', role:'wealthy manufacturer · capitalist voice', groups:['family','power'], tone:'warm', quote:'“A hard-headed, practical man of business.”', text:'Birling equates success with authority. His speeches are repeatedly punctured by dramatic irony, making his confidence look like complacency rather than wisdom.', change:'Refuses the lesson', meter:12, tags:['capitalism','dramatic irony','status']},
+      {id:'mrs-birling', name:'Sybil Birling', initials:'SB', role:'upper-class matriarch · charity chair', groups:['family','power'], tone:'gold', quote:'“Girls of that class”', text:'Her class prejudice turns a human being into a stereotype. Priestley also shows how patriarchy has narrowed her life into status, marriage and reputation.', change:'Deflects responsibility', meter:8, tags:['class','gender','prejudice']},
+      {id:'sheila', name:'Sheila Birling', initials:'SH', role:'young woman · conscience in motion', groups:['family','young'], tone:'sage', quote:'“These girls aren’t cheap labour—they’re people.”', text:'Sheila begins sheltered and privileged, but her capacity for self-criticism makes her the clearest sign of generational hope. Her change is real, but not magically complete.', change:'Learns and challenges', meter:78, tags:['change','generational divide','empathy']},
+      {id:'eric', name:'Eric Birling', initials:'ER', role:'son · hidden guilt and privilege', groups:['family','young'], tone:'blue', quote:'“The fact remains that I did what I did.”', text:'Eric is responsible for exploiting Eva and stealing money, yet he can recognise the moral reality of his actions. His remorse is important, but his drinking and evasions complicate redemption.', change:'Admits guilt, still flawed', meter:61, tags:['masculinity','responsibility','guilt']},
+      {id:'gerald', name:'Gerald Croft', initials:'GC', role:'upper-class fiancé · polished compromise', groups:['power','young'], tone:'warm', quote:'“She was a good sport.”', text:'Gerald can sound caring while still describing Eva through a language of male entitlement. He is willing to expose the Inspector, which lets him escape the deeper lesson.', change:'Temporary discomfort', meter:28, tags:['class','gender','privilege']},
+      {id:'goole', name:'Inspector Goole', initials:'IG', role:'moral interrogator · possible construct', groups:['outsider','power'], tone:'blue', quote:'“We are members of one body.”', text:'Goole controls the order of revelations and expands one death into a social argument. Whether supernatural, symbolic or simply theatrical, his power comes from the truth he makes the family face.', change:'The catalyst', meter:100, tags:['socialism','morality play','structure']},
+      {id:'eva', name:'Eva Smith', initials:'ES', role:'absent centre · working-class everywoman', groups:['outsider'], tone:'sage', quote:'“A pretty, lively sort of girl.”', text:'Eva never appears on stage. Her absence makes her both a person the family failed and a symbol of the many people made invisible by class, gender and economic power.', change:'Silenced by the system', meter:0, tags:['class','absence','representation']}
+    ];
+
+    const themes = [
+      {id:'responsibility', title:'Social responsibility', number:'01', text:'The play argues that choices ripple outward: private privilege can produce public harm.', hook:'Anchor quote: “We are members of one body.”', tags:['Inspector','Eva','change']},
+      {id:'class', title:'Class & capitalism', number:'02', text:'Money creates insulation, language creates distance, and the working class pay for the comfort of others.', hook:'Anchor quote: “It’s my duty to keep labour costs down.”', tags:['Birling','Mrs Birling','power']},
+      {id:'gender', title:'Gender & power', number:'03', text:'Women like Eva are doubly vulnerable; men use social and economic privilege, while women are trained to endure it.', hook:'Anchor quote: “You’ll have to get used to that.”', tags:['Sheila','Gerald','patriarchy']},
+      {id:'generations', title:'Generational divide', number:'04', text:'The older generation defend reputation; the younger characters can imagine a different social contract.', hook:'Anchor quote: “I know I’m to blame—and I’m desperately sorry.”', tags:['Sheila','Eric','hope']},
+      {id:'morality', title:'Morality & judgement', number:'05', text:'The play borrows from the morality play: characters embody vices and virtues while the audience is placed on trial too.', hook:'Anchor quote: “Fire and blood and anguish.”', tags:['Goole','form','audience']},
+      {id:'appearance', title:'Appearance vs reality', number:'06', text:'The dining room looks secure, the family looks respectable, and Birling looks authoritative—until the evidence arrives.', hook:'Anchor device: dramatic irony + the cyclical ending.', tags:['Birling','structure','irony']}
+    ];
+
+    const quotes = [
+      {id:'q1', text:'“The Titanic… absolutely unsinkable.”', speaker:'Arthur Birling · Act One', tags:['class','structure'], tagLabels:['dramatic irony','capitalism'], analysis:'The emphatic adverb “absolutely” makes Birling sound certain, but the audience knows the Titanic sank. Priestley discredits the capitalist voice before the Inspector arrives, turning confidence into a warning about untouchable elites.', method:'dramatic irony + symbolism', context:'1912 setting / 1945 audience'},
+      {id:'q2', text:'“A hard-headed, practical man of business.”', speaker:'Arthur Birling · Act One', tags:['class'], tagLabels:['self-image','status'], analysis:'The compound adjective is a self-advertisement, not a neutral description. Birling performs authority; the play then exposes how little his “practical” worldview understands human cost.', method:'self-characterisation', context:'capitalist individualism'},
+      {id:'q3', text:'“A man has to make his own way—has to look after himself.”', speaker:'Arthur Birling · Act One', tags:['class','responsibility'], tagLabels:['individualism','gender'], analysis:'The repeated “has to” presents selfishness as a natural law. Priestley makes the grammar of individualism sound rigid and outdated, then offers Goole’s collective “we” as its direct opposite.', method:'modal verb + repetition', context:'capitalism vs socialism'},
+      {id:'q4', text:'“It’s my duty to keep labour costs down.”', speaker:'Arthur Birling · Act One', tags:['class','responsibility'], tagLabels:['profit','dehumanisation'], analysis:'Birling calls profit-making a “duty”, replacing moral responsibility with financial obligation. The noun “labour costs” reduces workers to a business expense and explains why Eva can be dismissed so easily.', method:'semantic field of business', context:'workers had little protection'},
+      {id:'q5', text:'“Girls of that class.”', speaker:'Mrs Birling · Act Two', tags:['class','gender'], tagLabels:['stereotype','distance'], analysis:'The plural noun and demonstrative “that” erase Eva’s individuality. Mrs Birling turns a desperate person into a type, making prejudice feel like a respectable judgement.', method:'dehumanising categorisation', context:'class and gender hierarchy'},
+      {id:'q6', text:'“These girls aren’t cheap labour—they’re people.”', speaker:'Sheila · Act One', tags:['class','responsibility'], tagLabels:['dash','re-humanisation'], analysis:'The dash pivots from the language of the factory to the language of humanity. Sheila directly corrects her father and begins to see the system behind Eva’s treatment.', method:'antithesis + correction', context:'generational divide'},
+      {id:'q7', text:'“She was a good sport.”', speaker:'Gerald · Act Two', tags:['gender','class'], tagLabels:['euphemism','male privilege'], analysis:'The apparently complimentary phrase hides a transactional view of Eva. “Sport” makes her seem willing and convenient, helping Gerald soften his exploitation without fully confronting the power imbalance.', method:'euphemism + objectification', context:'patriarchal power'},
+      {id:'q8', text:'“You’ll have to get used to that—just as I had.”', speaker:'Mrs Birling · Act One', tags:['gender'], tagLabels:['normalised inequality','marriage'], analysis:'The resigned tone shows how patriarchy is passed between generations. Mrs Birling treats male infidelity as something a woman must endure, while Sheila begins to resist that inheritance.', method:'imperative + generational contrast', context:'women’s restricted social role'},
+      {id:'q9', text:'“We are members of one body.”', speaker:'Inspector Goole · Act Three', tags:['responsibility','structure'], tagLabels:['collective pronoun','socialism'], analysis:'The inclusive pronoun “we” removes the family’s protective boundaries. The metaphor makes society sound like a living body: harm to one part threatens the whole.', method:'metaphor + inclusive pronoun', context:'Priestley’s socialist message'},
+      {id:'q10', text:'“Public men, Mr Birling, have responsibilities as well as privileges.”', speaker:'Inspector Goole · Act Two', tags:['responsibility','class'], tagLabels:['balance','accountability'], analysis:'The balanced pairing of “responsibilities” and “privileges” exposes a social contract. The wealthy cannot keep the benefits of power while refusing its duties.', method:'antithesis + direct address', context:'public morality'},
+      {id:'q11', text:'“If men will not learn that lesson, then they will be taught in fire and blood and anguish.”', speaker:'Inspector Goole · Act Three', tags:['responsibility','structure'], tagLabels:['tricolon','prophecy'], analysis:'The tricolon escalates from “fire” to “blood” to “anguish”, sounding prophetic and biblical. The audience in 1945 knows how literal the warning has become after two world wars.', method:'tricolon + ominous imagery', context:'post-war audience'},
+      {id:'q12', text:'“I know I’m to blame—and I’m desperately sorry.”', speaker:'Sheila · Act Three', tags:['responsibility','gender'], tagLabels:['first person','remorse'], analysis:'The first person accepts causation rather than hiding behind technical legality. “Desperately” conveys genuine distress, but Priestley still leaves the audience to judge whether recognition becomes action.', method:'first-person confession', context:'younger generation / hope'},
+      {id:'q13', text:'“Everything we said had happened really had happened.”', speaker:'Sheila · Act Three', tags:['structure','responsibility'], tagLabels:['reality','moral truth'], analysis:'Sheila rejects the family’s attempt to make the Inspector’s identity the only question. The repetition of “happened” insists that moral truth survives even if legal proof disappears.', method:'repetition + meta-theatrical challenge', context:'the ambiguous ending'},
+      {id:'q14', text:'“If you don’t come down hard on these people they’d soon be asking for the earth.”', speaker:'Arthur Birling · Act One', tags:['class','gender'], tagLabels:['hostility','exaggeration'], analysis:'“These people” creates a boundary between employer and worker. The hyperbolic “the earth” reveals Birling’s fear that even modest demands for dignity threaten the entire class order.', method:'deictic distance + hyperbole', context:'industrial class conflict'}
+    ];
+
+    const flashcards = [
+      {id:'f1', type:'context', question:'When was the play written, and when is it set?', answer:'Written in 1945 and set in 1912. Priestley uses the gap for dramatic irony: the audience knows Birling’s confidence about war and progress is wrong.', tags:['1945','1912','dramatic irony']},
+      {id:'f2', type:'quote', question:'Complete the Inspector’s central metaphor: “We are members of…”', answer:'“…one body.” The inclusive pronoun and metaphor express collective responsibility: society is interconnected, so harm to one person matters to everyone.', tags:['Inspector','responsibility']},
+      {id:'f3', type:'character', question:'How does Sheila change across the play?', answer:'She moves from sheltered privilege to self-criticism. She accepts blame, challenges her parents and understands the lesson, making her a source of cautious generational hope.', tags:['Sheila','change']},
+      {id:'f4', type:'character', question:'Why is Eva Smith important even though she never appears?', answer:'Her absence makes her an “everywoman” for the working class. The family’s failure to see her as an individual is part of Priestley’s criticism of dehumanising systems.', tags:['Eva','absence','class']},
+      {id:'f5', type:'theme', question:'What is Priestley attacking through Mr Birling?', answer:'Capitalist individualism, upper-class complacency and the belief that wealth creates moral authority. Dramatic irony repeatedly makes Birling’s certainty collapse.', tags:['Birling','capitalism']},
+      {id:'f6', type:'quote', question:'Which short quote exposes Mrs Birling’s class prejudice?', answer:'“Girls of that class.” The plural category and “that” erase Eva’s individuality and turn a stereotype into an excuse for refusing help.', tags:['Mrs Birling','prejudice']},
+      {id:'f7', type:'context', question:'What is a morality play, and why is it useful here?', answer:'A form of drama that teaches a moral lesson through symbolic characters and vices or virtues. Goole acts as a moral judge while the Birlings embody social failings.', tags:['form','Goole']},
+      {id:'f8', type:'theme', question:'How does the ending support Priestley’s message?', answer:'The final phone call is cyclical: another death and another Inspector are coming. Society will repeat its failures until people genuinely accept responsibility.', tags:['structure','cyclical ending']},
+      {id:'f9', type:'quote', question:'Which quote is the best opposite to “A man has to make his own way”?', answer:'“We are members of one body.” Birling’s individualism is answered by Goole’s collective “we”: two competing social philosophies.', tags:['individualism','socialism']},
+      {id:'f10', type:'theme', question:'How are gender and class connected in Eva’s story?', answer:'Eva is vulnerable because she is both working class and a woman. Men with money and status can exploit her; Mrs Birling’s prejudice then denies her support.', tags:['gender','class','power']},
+      {id:'f11', type:'character', question:'Is Inspector Goole a real inspector?', answer:'The play deliberately leaves this unresolved. He can be read as supernatural, symbolic or theatrical; what matters is the truth of the lesson, not a detective-style solution.', tags:['ambiguity','structure']},
+      {id:'f12', type:'quote', question:'What does “fire and blood and anguish” suggest?', answer:'A prophetic tricolon that intensifies into biblical-sounding warning. To a 1945 audience, it also echoes the real devastation of two world wars.', tags:['tricolon','context']}
+    ];
+
+    const examQuestions = [
+      {id:'e1', focus:'Character question', prompt:'How does Priestley present Mr Birling as a man who misunderstands responsibility?', thesis:'Priestley makes Birling’s confidence look morally and historically blind: he treats profit as duty, individuals as competitors, and social responsibility as interference.', answer:'Begin with Birling’s self-description as a <em>“hard-headed, practical man of business”</em>. The confident compound adjective sounds authoritative, but Priestley undercuts it through dramatic irony: the audience knows the Titanic did sink and that war will come. Move to <em>“It’s my duty to keep labour costs down”</em>: the noun “duty” is usually moral, but Birling applies it to profit, reducing workers to costs. Finally, contrast his individualism with Goole’s <em>“We are members of one body”</em>. Priestley asks a post-war audience to reject the idea that wealth or business success excuses harm.', moves:[['POSITION','Birling performs authority, but Priestley makes it unreliable.'],['METHOD','Self-characterisation + dramatic irony.'],['CONTEXT','1912 confidence judged by a 1945 audience.'],['PURPOSE','Replace individualism with social responsibility.']]},
+      {id:'e2', focus:'Character question', prompt:'How does Priestley present Sheila as different from her parents?', thesis:'Sheila is not innocent, but her willingness to confront her own privilege makes her the play’s strongest evidence that social attitudes can change.', answer:'Sheila first participates in the family’s privilege, but her language changes once she recognises Eva as a person: <em>“These girls aren’t cheap labour—they’re people.”</em> The dash creates a sharp correction from Birling’s economic vocabulary to human dignity. Later, <em>“I know I’m to blame”</em> uses the first person to accept causation rather than hide behind legality. Structurally, she understands the Inspector’s lesson while her parents look for an escape. Priestley therefore uses the generational divide to offer hope, while keeping that hope challenging rather than easy.', moves:[['POSITION','Sheila changes because she can self-interrogate.'],['METHOD','Antithesis, first person and structural contrast.'],['CONTEXT','A post-war audience is invited to choose change.'],['PURPOSE','Make the younger generation responsible for reform.']]},
+      {id:'e3', focus:'Theme question', prompt:'How does Priestley present social responsibility in An Inspector Calls?', thesis:'Responsibility is presented as collective rather than optional: the family’s separate choices form one chain, and the Inspector turns a private death into a public warning.', answer:'The Inspector’s central metaphor, <em>“We are members of one body,”</em> uses the inclusive pronoun “we” to dissolve the family’s boundaries. It answers Birling’s <em>“A man has to make his own way”</em>, so Priestley stages a clash between individualism and collectivism. Each revelation then makes responsibility cumulative: one person’s dismissal is followed by exploitation, prejudice and neglect. The cyclical final phone call shows that the lesson has not yet been learned. For Priestley, responsibility is not simply feeling guilty after harm; it means changing the system that made the harm possible.', moves:[['POSITION','Responsibility is a social contract, not a private feeling.'],['METHOD','Metaphor, pronoun contrast and cyclical structure.'],['CONTEXT','Socialist ideas were powerful for a 1945 audience.'],['PURPOSE','Warn that refusing the lesson creates repetition.']]},
+      {id:'e4', focus:'Theme question', prompt:'How does Priestley present class prejudice?', thesis:'Class prejudice works by turning individuals into categories: once Eva is labelled, the powerful can treat her suffering as predictable and therefore undeserving.', answer:'Mrs Birling’s phrase <em>“girls of that class”</em> uses a plural category rather than Eva’s name. The demonstrative “that” creates social distance and makes prejudice sound like common sense. Birling’s <em>“these people”</em> performs a similar boundary between employer and worker. Priestley contrasts this language with Sheila’s insistence that the girls are <em>“people”</em>, restoring individuality through the noun. Eva’s absent stage presence makes the point structural: the class system has made her invisible before the play begins.', moves:[['POSITION','Language turns inequality into an excuse.'],['METHOD','Deictic distance, plural nouns and contrast.'],['CONTEXT','Rigid 1912 class hierarchy and weak worker protection.'],['PURPOSE','Make the audience notice who gets named and who does not.']]},
+      {id:'e5', focus:'Character question', prompt:'How does Priestley present Inspector Goole as a force for change?', thesis:'Goole is less a realistic detective than a theatrical moral force: he controls the revelations so the audience sees a system, not a series of accidents.', answer:'Goole’s authority comes from control of structure. He questions one person at a time, building a chain in which each answer recontextualises the last. His metaphor <em>“We are members of one body”</em> transforms the family drama into a social argument, while the prophetic <em>“fire and blood and anguish”</em> gives him an almost biblical register. Priestley keeps Goole’s identity ambiguous so that the family cannot reduce the message to a police trick. The audience, rather than the Inspector, must carry the lesson beyond the curtain.', moves:[['POSITION','Goole is a moral device, not only a policeman.'],['METHOD','Controlled revelations, metaphor and prophetic imagery.'],['CONTEXT','Morality-play form + post-war warning.'],['PURPOSE','Place the audience under examination.']]},
+      {id:'e6', focus:'Structure question', prompt:'How does Priestley use the ending to shape the audience’s response?', thesis:'The ending refuses closure. Its cyclical structure suggests that social change is unfinished and that the audience may be the next group to receive the call.', answer:'After the Inspector leaves, the older characters try to make the evening disappear by questioning his identity. Sheila resists this escape with <em>“Everything we said had happened really had happened”</em>, shifting attention from legal proof to moral truth. The phone call then repeats the play’s opening disturbance: a girl has died and an Inspector is coming. This circular structure makes the family’s failure feel systemic rather than isolated. Priestley leaves the curtain open on purpose—the audience must decide whether it will learn the lesson before the cycle repeats.', moves:[['POSITION','The structure denies comfortable closure.'],['METHOD','Cyclical ending, repetition and meta-theatrical challenge.'],['CONTEXT','The play looks back from 1945 after two world wars.'],['PURPOSE','Make the audience responsible for what happens next.']]}
+    ];
+
+    const stateKey = 'inspectorsDeskProgressV1';
+    const saved = JSON.parse(localStorage.getItem(stateKey) || '{}');
+    const state = {known: saved.known || [], quoteSecure: saved.quoteSecure || [], scores: saved.scores || {}, streak: saved.streak || 0, lastDay: saved.lastDay || '', notes: saved.notes || ''};
+    let currentView = 'home';
+    let characterFilter = 'all';
+    let quoteFilter = 'all';
+    let flashFilter = 'all';
+    let flashQueue = [];
+    let flashPos = 0;
+    let examIndex = 0;
+    let examRevealed = false;
+    let toastTimer;
+
+    function saveState() { localStorage.setItem(stateKey, JSON.stringify(state)); updateDashboard(); }
+    function todayStamp() { return new Date().toISOString().slice(0,10); }
+    function touchStreak() { const today = todayStamp(); if (state.lastDay !== today) { const last = new Date(state.lastDay || 0); const now = new Date(today); const diff = Math.round((now-last)/86400000); state.streak = diff === 1 ? (state.streak || 0) + 1 : 1; state.lastDay = today; saveState(); } }
+    function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(()=>t.classList.remove('show'), 2300); }
+    function go(view) { currentView = view; document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active', v.id === 'view-'+view)); document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active', b.dataset.view===view)); const labels={home:'Command centre',story:'Story map',characters:'Characters',themes:'Themes',quotes:'Quote vault',flashcards:'Flashcards',exam:'Exam lab',context:'Context & author'}; document.getElementById('crumbTitle').textContent=labels[view]; window.scrollTo({top:0, behavior:'smooth'}); if(view==='flashcards') renderFlash(); }
+    function renderCharacters() { const grid=document.getElementById('characterGrid'); const data=characterFilter==='all'?characters:characters.filter(c=>c.groups.includes(characterFilter)); grid.innerHTML=data.map(c=>`<article class="character-card"><div class="character-head"><div class="avatar ${c.tone}">${c.initials}</div><div><h3>${c.name}</h3><div class="role">${c.role}</div></div></div><div class="tag-row">${c.tags.map((t,i)=>`<span class="tag ${i===0?'amber':''}">${t}</span>`).join('')}</div><div class="mini-quote">${c.quote}</div><p>${c.text}</p><div class="change-bar"><small><span>Exam trajectory</span><b>${c.change}</b></small><div class="meter"><span style="width:${c.meter}%"></span></div></div></article>`).join('') || '<div class="empty">No files match that filter.</div>'; }
+    function renderThemes() { document.getElementById('themeGrid').innerHTML=themes.map(t=>`<article class="theme-card"><div class="theme-top"><div class="eyebrow">Theme lens</div><div class="theme-number">${t.number}</div></div><h3>${t.title}</h3><p>${t.text}</p><div class="theme-hook">${t.hook}</div><div class="tag-row" style="margin-top:12px">${t.tags.map(x=>`<span class="tag">${x}</span>`).join('')}</div></article>`).join(''); }
+    function renderQuotes() { const data=quoteFilter==='all'?quotes:quotes.filter(q=>q.tags.includes(quoteFilter)); document.getElementById('quoteCount').textContent=`${data.length} of ${quotes.length} evidence files`; document.getElementById('quoteGrid').innerHTML=data.map(q=>`<article class="quote-card" data-quote="${q.id}" tabindex="0"><div class="speaker">${q.speaker}</div><div class="quote-text">${q.text}</div><div class="tag-row">${q.tagLabels.map((t,i)=>`<span class="tag ${i===0?'amber':''}">${t}</span>`).join('')}</div><div class="quote-analysis"><p><b>Method:</b> ${q.method}</p><p><b>Reading:</b> ${q.analysis}</p><p><b>Context link:</b> ${q.context}</p><button class="ghost-btn quote-secure" data-id="${q.id}" style="margin-top:2px">${state.quoteSecure.includes(q.id)?'✓ Secure in memory':'Mark as secure'}</button></div></article>`).join('') || '<div class="empty">No evidence files match that lens.</div>'; }
+    function filteredCards() { return flashcards.filter(f=>flashFilter==='all'||f.type===flashFilter); }
+    function buildQueue(shuffle=true) { flashQueue=filteredCards().map(f=>f.id); if(shuffle) flashQueue.sort(()=>Math.random()-.5); flashPos=0; renderFlash(); }
+    function currentFlash() { const id=flashQueue[flashPos % (flashQueue.length||1)]; return flashcards.find(f=>f.id===id) || flashcards[0]; }
+    function renderFlash() { if(!flashQueue.length) buildQueue(); const f=currentFlash(); document.getElementById('flashcard').classList.remove('flipped'); document.getElementById('flashQuestion').textContent=f.question; document.getElementById('flashAnswerTitle').textContent=f.type[0].toUpperCase()+f.type.slice(1)+' evidence'; document.getElementById('flashAnswer').textContent=f.answer; document.getElementById('flashTags').innerHTML=f.tags.map(t=>`<span class="tag ${t==='responsibility'?'red':''}">${t}</span>`).join(''); document.getElementById('flashIndex').textContent=String((flashPos%flashQueue.length)+1).padStart(2,'0'); document.getElementById('queueCount').textContent=`${Math.min(flashPos+1,flashQueue.length)} / ${flashQueue.length}`; document.getElementById('queueProgress').style.width=`${Math.min(100,((flashPos+1)/flashQueue.length)*100)}%`; const sec=state.known.length; document.getElementById('secureCount').textContent=sec; document.getElementById('secureProgress').style.width=`${Math.min(100,(sec/flashcards.length)*100)}%`; }
+    function nextFlash(known) { const f=currentFlash(); if(known && !state.known.includes(f.id)) state.known.push(f.id); if(!known) { flashQueue.push(f.id); } else { flashPos++; } if(flashPos>=flashQueue.length) flashPos=0; touchStreak(); saveState(); renderFlash(); showToast(known?'Card secured. Nice.':'Card returned to the queue.'); }
+    function updateDashboard() { const mastery=Math.round(((state.known.length+state.quoteSecure.length)/(flashcards.length+quotes.length))*100); document.getElementById('progressPct').textContent=mastery+'%'; document.getElementById('progressRing').style.setProperty('--progress', mastery+'%'); document.getElementById('statQuotes').textContent=state.quoteSecure.length; document.getElementById('statCards').textContent=state.known.length; document.getElementById('statEssays').textContent=Object.keys(state.scores).length; document.getElementById('statStreak').textContent=state.streak||0; document.getElementById('progressMessage').textContent=mastery===0?'Every remembered connection makes the final answer sharper.':mastery<35?'You have evidence. Now make the links between it.':mastery<70?'The case is taking shape. Keep testing retrieval.':'Strong case file. Now practise writing under pressure.'; }
+    function renderQuestions() { document.getElementById('questionList').innerHTML=examQuestions.map((q,i)=>`<button class="question-btn ${i===examIndex?'active':''}" data-exam="${i}"><small>${q.focus}</small><span>${q.prompt}</span></button>`).join(''); }
+    function renderExam() { const q=examQuestions[examIndex]; document.getElementById('examFocus').textContent=q.focus; document.getElementById('examPrompt').textContent=q.prompt; document.getElementById('examThesis').textContent=q.thesis; document.getElementById('answerCopy').innerHTML=q.answer; document.getElementById('moveGrid').innerHTML=q.moves.map(m=>`<div class="move"><strong>${m[0]}</strong>${m[1]}</div>`).join(''); document.getElementById('modelAnswer').classList.toggle('visible',examRevealed); document.getElementById('revealAnswer').textContent=examRevealed?'Hide model route':'Reveal model route'; document.getElementById('scoreFeedback').textContent=state.scores[q.id]?`Saved as ${state.scores[q.id]}/3`:''; renderQuestions(); }
+    function generatePlan() { const type=document.getElementById('planType').value, lens=document.getElementById('planLens').value; const plans={sheila:['Priestley presents Sheila as a privileged young woman whose self-criticism allows her to outgrow the values of her parents.','“These girls aren’t cheap labour—they’re people” → “I know I’m to blame.”','Priestley offers change as possible, but makes the audience ask whether recognition becomes responsibility.'],birling:['Priestley uses Birling to expose the moral and historical blindness of capitalist individualism.','“A hard-headed, practical man of business” → “keep labour costs down” → Titanic dramatic irony.','The 1945 audience is invited to distrust confident voices that protect privilege.'],inspector:['Priestley makes Inspector Goole a moral force whose questions turn one death into a social diagnosis.','“We are members of one body” → “fire and blood and anguish.”','His ambiguous identity keeps the audience focused on the lesson rather than a detective solution.'],responsibility:['Priestley presents responsibility as collective: no person acts in a vacuum, and no society can outsource the consequences.','Birling’s “make his own way” against Goole’s “one body”.','The cyclical ending warns that refusing responsibility makes history repeat itself.'],gender:['Priestley shows gender power working through both male entitlement and female social conditioning.','Gerald’s “good sport” alongside Mrs Birling’s “girls of that class”.','The audience is asked to see how class and patriarchy combine to make Eva vulnerable.']}[lens]||['Build a clear argument from a precise detail.','Choose one short quotation and name the method.','End with Priestley’s purpose and the audience’s responsibility.']; const labels={character:'POSITION',theme:'EVIDENCE ROUTE',structure:'STRUCTURE / PURPOSE'}; document.getElementById('architectOutput').innerHTML=`<div class="output-chip"><b>01 · ${labels[type]||'POSITION'}</b>${plans[0]}</div><div class="output-chip"><b>02 · Evidence route</b>${plans[1]}</div><div class="output-chip"><b>03 · Why it matters</b>${plans[2]}</div>`; touchStreak(); showToast('Argument route generated. Now put it in your own words.'); }
+
+    document.addEventListener('click', e=>{
+      const nav=e.target.closest('[data-view]'); if(nav){ go(nav.dataset.view); return; }
+      const cf=e.target.closest('#characterFilters .filter'); if(cf){ characterFilter=cf.dataset.filter; document.querySelectorAll('#characterFilters .filter').forEach(x=>x.classList.toggle('active',x===cf)); renderCharacters(); return; }
+      const qf=e.target.closest('#quoteFilters .filter'); if(qf){ quoteFilter=qf.dataset.filter; document.querySelectorAll('#quoteFilters .filter').forEach(x=>x.classList.toggle('active',x===qf)); renderQuotes(); return; }
+      const qc=e.target.closest('.quote-card'); if(qc && !e.target.closest('.quote-secure')){ document.querySelectorAll('.quote-card').forEach(x=>x.classList.remove('selected')); qc.classList.add('selected'); return; }
+      const secure=e.target.closest('.quote-secure'); if(secure){ const id=secure.dataset.id; if(!state.quoteSecure.includes(id)) state.quoteSecure.push(id); else state.quoteSecure=state.quoteSecure.filter(x=>x!==id); saveState(); renderQuotes(); showToast(state.quoteSecure.includes(id)?'Quote marked secure.':'Quote returned to the locker.'); return; }
+      const ex=e.target.closest('[data-exam]'); if(ex){ examIndex=Number(ex.dataset.exam); examRevealed=false; renderExam(); return; }
+      if(e.target.closest('#randomQuestion')){ examIndex=Math.floor(Math.random()*examQuestions.length); examRevealed=false; renderExam(); return; }
+      if(e.target.closest('#revealAnswer')){ examRevealed=!examRevealed; renderExam(); return; }
+      const score=e.target.closest('.score'); if(score){ state.scores[examQuestions[examIndex].id]=Number(score.dataset.score); touchStreak(); saveState(); renderExam(); showToast('Exam self-score saved.'); return; }
+      if(e.target.closest('#generatePlan')){ generatePlan(); return; }
+      if(e.target.closest('#flashcard')||e.target.closest('#flashFlip')){ document.getElementById('flashcard').classList.toggle('flipped'); return; }
+      if(e.target.closest('#flashAgain')){ nextFlash(false); return; }
+      if(e.target.closest('#flashKnow')){ nextFlash(true); return; }
+      if(e.target.closest('#shuffleCards')){ buildQueue(true); showToast('Queue reshuffled.'); return; }
+      if(e.target.closest('#themeToggle')){ document.body.classList.toggle('soft-mode'); document.documentElement.style.setProperty('--paper', document.body.classList.contains('soft-mode')?'#efe9dd':'#f5f1e9'); showToast(document.body.classList.contains('soft-mode')?'Warm reading mode on.':'Warm reading mode off.'); return; }
+      if(e.target.closest('#resetProgress')){ if(confirm('Reset all local revision progress?')){ localStorage.removeItem(stateKey); location.reload(); } return; }
+    });
+    document.getElementById('flashFilter').addEventListener('change', e=>{ flashFilter=e.target.value; buildQueue(true); });
+    document.getElementById('revisionNotes').value=state.notes||'';
+    document.getElementById('revisionNotes').addEventListener('input',e=>{state.notes=e.target.value; localStorage.setItem(stateKey,JSON.stringify(state));});
+    const globalSearch=document.getElementById('globalSearch'), searchPanel=document.getElementById('searchPanel');
+    globalSearch.addEventListener('input',()=>{ const term=globalSearch.value.trim().toLowerCase(); if(!term){searchPanel.classList.remove('open');return;} const results=[]; characters.forEach(c=>{if((c.name+' '+c.role+' '+c.text+' '+c.tags.join(' ')).toLowerCase().includes(term))results.push({kind:'Character',title:c.name,view:'characters'});}); themes.forEach(t=>{if((t.title+' '+t.text+' '+t.tags.join(' ')).toLowerCase().includes(term))results.push({kind:'Theme',title:t.title,view:'themes'});}); quotes.forEach(q=>{if((q.text+' '+q.analysis+' '+q.tagLabels.join(' ')).toLowerCase().includes(term))results.push({kind:'Quote',title:q.text,view:'quotes'});}); flashcards.forEach(f=>{if((f.question+' '+f.answer+' '+f.tags.join(' ')).toLowerCase().includes(term))results.push({kind:'Flashcard',title:f.question,view:'flashcards'});}); searchPanel.innerHTML=results.slice(0,7).map(r=>`<button class="search-result" data-view="${r.view}"><small>${r.kind}</small><b>${r.title}</b></button>`).join('') || '<div class="micro-note" style="padding:12px">No matching evidence. Try “responsibility”, “Titanic” or “Eva”.</div>'; searchPanel.classList.add('open'); });
+    globalSearch.addEventListener('keydown',e=>{if(e.key==='Escape'){searchPanel.classList.remove('open');globalSearch.blur();}});
+    document.addEventListener('click',e=>{if(!e.target.closest('.search-wrap'))searchPanel.classList.remove('open');});
+    document.addEventListener('keydown',e=>{ if(currentView!=='flashcards' || ['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName))return; if(e.key===' '){e.preventDefault();document.getElementById('flashcard').classList.toggle('flipped');} if(e.key==='1')nextFlash(false); if(e.key==='2')nextFlash(true); if(e.key.toLowerCase()==='r')buildQueue(true); });
+
+    renderCharacters(); renderThemes(); renderQuotes(); renderQuestions(); renderExam(); buildQueue(true); updateDashboard();
+  </script>
+<a id="pennine-library-return" href="index.html" aria-label="Return to the topic library">← Topic library</a>
+</body>
+</html>

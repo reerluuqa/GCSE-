@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PIE/360° — Higher Pie Charts Practice Booklet</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%23f6f1e7' stroke='%2317130e' stroke-width='2'/%3E%3Cpath d='M16 16 L16 2 A14 14 0 0 1 28 22 Z' fill='%23b81d2c'/%3E%3Ccircle cx='16' cy='16' r='14' fill='none' stroke='%2317130e' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Fraunces:opsz,wght@9..144,600;9..144,900&family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+/* ============ TOKENS ============ */
+:root{
+  --desk:#1d241f; --desk2:#141a16;
+  --paper:#f6f1e4; --paper2:#fdf9ee; --paper3:#efe8d6;
+  --ink:#17130e; --ink2:#3d382f; --pencil:#8a8172;
+  --red:#b81d2c; --red2:#8f1420; --blue:#2745b0; --green:#1d6b3f;
+  --hi:rgba(255,228,88,.32);
+  --rule:rgba(39,69,176,.16); --margin:rgba(184,29,44,.38);
+  --mono:'IBM Plex Mono',monospace; --serif:'Newsreader',Georgia,serif;
+  --disp:'Fraunces',serif; --hand:'Caveat',cursive; --sans:'Inter',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:
+    radial-gradient(1200px 800px at 50% -10%, #2c362d 0%, transparent 60%),
+    radial-gradient(900px 700px at 110% 110%, #232b23 0%, transparent 55%),
+    linear-gradient(var(--desk), var(--desk2));
+  color:var(--ink); font-family:var(--serif); font-size:18px; min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+body::after{content:''; position:fixed; inset:0; pointer-events:none; z-index:400; opacity:.5; mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.28'/%3E%3C/svg%3E");}
+::selection{background:var(--red); color:var(--paper2)}
+button{font-family:inherit; cursor:pointer}
+input{font-family:inherit}
+[hidden]{display:none!important}
+
+/* ============ SHARED CHROME ============ */
+.topbar{position:sticky; top:0; z-index:200; display:flex; align-items:center; gap:14px; padding:12px 22px;
+  background:rgba(20,26,22,.86); backdrop-filter:blur(10px); border-bottom:1px solid rgba(246,241,228,.12); color:var(--paper)}
+.brand{display:flex; align-items:center; gap:10px; font-family:var(--mono); font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--paper)}
+.brand .pieglyph{width:24px;height:24px;border:1.6px solid var(--paper);border-radius:50%;
+  background:conic-gradient(var(--red) 0 132deg, var(--paper) 132deg 180deg, #d8d0ba 180deg 228deg, var(--paper2) 228deg 360deg); position:relative}
+.brand .pieglyph::after{content:'';position:absolute;inset:0;border-radius:50%;
+  background:linear-gradient(to right, transparent calc(50% - .8px), var(--paper) 50%);}
+.topbar .spacer{flex:1}
+.chip{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:12.5px;letter-spacing:.06em;
+  border:1px solid rgba(246,241,228,.3); color:var(--paper); padding:7px 13px; border-radius:2px; background:transparent; transition:.18s}
+.chip b{font-weight:600}
+button.chip:hover{border-color:var(--paper); background:rgba(246,241,228,.08)}
+.chip.red{border-color:rgba(255,120,128,.55); color:#ffb3b8}
+.chip.red:hover{background:rgba(184,29,44,.25); border-color:#ff8f96}
+.chip svg{width:15px;height:15px}
+.topbar .lucide{width:15px;height:15px}
+
+/* ============ SHEET / PAPER ============ */
+.deskwrap{padding:34px 16px 90px; position:relative}
+.sheet{
+  max-width:900px; margin:0 auto; position:relative;
+  background:linear-gradient(105deg, var(--paper2), var(--paper) 60%);
+  box-shadow:0 2px 0 rgba(0,0,0,.2), 0 30px 70px rgba(0,0,0,.5), 0 3px 10px rgba(0,0,0,.4);
+  padding:52px 58px 60px 88px;
+  border-radius:1px;
+  transition:transform .38s cubic-bezier(.2,.8,.2,1), opacity .3s;
+}
+.sheet::before{content:''; position:absolute; top:0; bottom:0; left:52px; width:1.5px; background:var(--margin); opacity:.65}
+.sheet::after{content:''; position:absolute; inset:0; pointer-events:none; opacity:.35; mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.55' numOctaves='2'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23p)' opacity='.16'/%3E%3C/svg%3E");}
+.punch{position:absolute; left:16px; width:15px; height:15px; border-radius:50%;
+  background:radial-gradient(circle at 40% 35%, #0d120e, #263029 70%);
+  box-shadow:inset 0 2px 4px rgba(0,0,0,.8), 0 1px 0 rgba(255,255,255,.5);}
+.sheet.turning{transform:translateX(-46px) rotate(-1.2deg); opacity:0}
+.sheet.arriving{animation:arrive .45s cubic-bezier(.2,.9,.25,1)}
+@keyframes arrive{from{transform:translateX(56px) rotate(1.4deg); opacity:0} to{transform:none; opacity:1}}
+
+/* question header */
+.qhead{display:flex; align-items:baseline; gap:16px; border-bottom:2.5px solid var(--ink); padding-bottom:12px; margin-bottom:20px}
+.qno{background:var(--ink); color:var(--paper2); font-family:var(--mono); font-weight:600; font-size:19px; padding:5px 13px; transform:rotate(-1deg)}
+.qtopic{font-family:var(--mono); font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:var(--pencil)}
+.qmarks{margin-left:auto; font-family:var(--mono); font-weight:600; font-size:15px; letter-spacing:.04em; white-space:nowrap}
+.qmarks .awa{font-family:var(--hand); font-size:24px; color:var(--red); margin-left:10px; font-weight:700}
+.qbody{font-size:19px; line-height:1.65; margin-bottom:8px}
+.qbody b{font-weight:600}
+.qbody .small{font-size:16px; color:var(--ink2)}
+.figure{display:flex; gap:28px; flex-wrap:wrap; justify-content:center; align-items:flex-start; margin:18px 0 10px}
+.figbox{text-align:center}
+.figcap{font-family:var(--mono); font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--pencil); margin-top:8px}
+svg.pie{width:min(330px,88vw); height:auto; display:block}
+svg.pie .lb{font-family:var(--mono); font-size:14.5px; fill:var(--ink); font-weight:600}
+svg.pie .an{font-family:var(--mono); font-size:16.5px; fill:var(--ink); font-weight:600}
+svg.pie .qn{font-family:var(--hand); font-size:30px; fill:var(--red); font-weight:700}
+svg.pie.smallpie{width:min(240px,80vw)}
+
+/* tables */
+.gtable{border-collapse:collapse; margin:20px auto; font-family:var(--mono); font-size:15.5px; background:var(--paper2); box-shadow:0 2px 6px rgba(0,0,0,.12)}
+.gtable th{border:1.5px solid var(--ink); padding:9px 20px; text-transform:uppercase; letter-spacing:.1em; font-size:12px; background:var(--paper3)}
+.gtable td{border:1.5px solid var(--ink); padding:9px 20px; text-align:center}
+.gtable td:first-child{text-align:left}
+.gtable tr.total td{border-top:3px double var(--ink); font-weight:600}
+
+/* parts & answers */
+.part{margin:16px 0; padding-left:2px}
+.part .pask{font-size:18.5px; line-height:1.55}
+.part .plabel{font-weight:600; margin-right:8px}
+.ansrow{display:flex; align-items:flex-end; gap:10px; margin-top:10px; flex-wrap:wrap}
+.ansrow .alab{font-family:var(--mono); font-size:12px; text-transform:uppercase; letter-spacing:.16em; color:var(--pencil); padding-bottom:9px}
+.ansruled{flex:1; min-width:60px; border-bottom:2px solid var(--ink); height:26px; opacity:.35}
+.ansin{border:none; border-bottom:2.5px solid var(--ink); background:transparent; font-family:var(--mono); font-size:20px;
+  width:130px; text-align:center; padding:3px 8px; color:var(--ink); outline:none; transition:.15s; border-radius:3px 3px 0 0}
+.ansin:focus{border-color:var(--red); background:rgba(184,29,44,.05)}
+.ansin[readonly]{color:var(--ink2); border-style:dashed}
+.ansin.ok{border-color:var(--green); color:var(--green)}
+.ansin.bad{border-color:var(--red); color:var(--red); text-decoration:line-through 2px rgba(184,29,44,.7)}
+.unit{font-family:var(--mono); font-size:15px; color:var(--ink2); padding-bottom:5px}
+.permark{font-family:var(--mono); font-size:12.5px; color:var(--pencil); padding-bottom:8px}
+.pm_earned{font-family:var(--hand); font-size:24px; font-weight:700; color:var(--red); transform:rotate(-6deg); display:inline-block; padding-bottom:6px}
+.opts{margin:10px 0 0 26px; display:flex; flex-direction:column; gap:9px}
+.opt{display:flex; align-items:flex-start; gap:12px; font-size:17.5px; cursor:pointer; padding:7px 10px; border:1.5px solid transparent; border-radius:3px; transition:.15s}
+.opt:hover{background:rgba(23,19,14,.05)}
+.opt input{accent-color:var(--red); width:17px; height:17px; margin-top:4px}
+.opt .olet{font-family:var(--mono); font-weight:600; border:1.5px solid var(--ink); width:24px; height:24px; display:grid; place-items:center; font-size:12.5px; flex:none; margin-top:1px}
+.opt.picked{border-color:var(--ink); background:rgba(23,19,14,.04)}
+.opt.right{border-color:var(--green); background:rgba(29,107,63,.08)}
+.opt.wrong{border-color:var(--red); background:rgba(184,29,44,.07)}
+.opt.locked{pointer-events:none}
+
+/* working area */
+.worklabel{display:flex; align-items:center; gap:10px; font-family:var(--mono); font-size:11px; letter-spacing:.25em; text-transform:uppercase; color:var(--pencil); margin:26px 0 0}
+.worklabel::before,.worklabel::after{content:'';flex:1;height:1px;background:var(--pencil);opacity:.4}
+.work{position:relative; margin-top:10px; min-height:190px; border:1.5px dashed rgba(23,19,14,.35); border-radius:2px; overflow:hidden;
+  background-image:
+    linear-gradient(90deg, transparent 42px, rgba(184,29,44,.30) 42px, rgba(184,29,44,.30) 43.5px, transparent 43.5px),
+    repeating-linear-gradient(180deg, transparent 0 25px, var(--rule) 25px 26px);
+  background-color:rgba(253,249,238,.5);}
+.work canvas{position:absolute; inset:0; width:100%; height:100%; touch-action:none; cursor:crosshair; mix-blend-mode:multiply}
+.workghost{position:absolute; right:16px; bottom:12px; font-family:var(--hand); font-size:22px; color:var(--red); transform:rotate(-4deg); max-width:60%; text-align:right; pointer-events:none; animation:arrive .5s}
+.padtools{position:absolute; top:8px; right:8px; display:flex; gap:6px; z-index:5}
+.padt{width:30px; height:30px; display:grid; place-items:center; border:1.5px solid var(--ink2); background:var(--paper2); color:var(--ink2); border-radius:2px; transition:.15s}
+.padt:hover,.padt.on{background:var(--ink); color:var(--paper2)}
+.padt svg{width:15px;height:15px}
+
+/* actions */
+.actions{display:flex; gap:14px; margin-top:26px; flex-wrap:wrap; align-items:center}
+.btn{font-family:var(--mono); font-size:13.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase;
+  border:2px solid var(--ink); background:var(--ink); color:var(--paper2); padding:13px 24px; border-radius:2px;
+  box-shadow:4px 4px 0 rgba(0,0,0,.28); transition:.15s; display:inline-flex; align-items:center; gap:9px}
+.btn:hover{transform:translate(-2px,-2px); box-shadow:6px 6px 0 rgba(0,0,0,.28)}
+.btn:active{transform:translate(1px,1px); box-shadow:2px 2px 0 rgba(0,0,0,.28)}
+.btn.ghost{background:transparent; color:var(--ink)}
+.btn.red{background:var(--red); border-color:var(--red)}
+.btn svg,.btn .lucide{width:16px;height:16px}
+.shake{animation:shake .4s}
+@keyframes shake{0%,100%{transform:none}25%{transform:translateX(-7px) rotate(-.4deg)}60%{transform:translateX(6px) rotate(.3deg)}}
+
+/* feedback */
+.feedback{margin-top:30px; border-top:3px double var(--ink); padding-top:22px; position:relative; animation:arrive .5s}
+.stamp{position:absolute; top:-4px; right:0; font-family:var(--hand); font-weight:700; font-size:30px; color:var(--red);
+  border:3px solid var(--red); padding:2px 16px 0; border-radius:6px; transform:rotate(-7deg); opacity:.92;
+  animation:stampin .35s cubic-bezier(.2,1.6,.4,1) both; letter-spacing:.02em}
+.stamp.bad{color:var(--red); border-style:double}
+@keyframes stampin{from{transform:scale(2.4) rotate(-7deg); opacity:0} to{transform:scale(1) rotate(-7deg); opacity:.92}}
+.verdict{font-family:var(--hand); font-size:32px; color:var(--red); font-weight:700; line-height:1.25; margin-bottom:14px; transform:rotate(-.8deg)}
+.verdict small{font-size:22px; color:var(--ink2); font-family:var(--serif); font-style:italic; display:block; margin-top:2px; transform:none}
+.pverdicts{display:flex; flex-direction:column; gap:6px; margin:10px 0 18px}
+.pv{display:flex; align-items:center; gap:10px; font-family:var(--mono); font-size:14.5px}
+.pv .tk{width:20px;height:20px;flex:none}
+.pv b{font-weight:600}
+.pv .given{color:var(--pencil); text-decoration:line-through}
+.box{border:1.5px solid var(--ink); border-radius:2px; padding:18px 20px; margin:14px 0; position:relative}
+.boxhead{font-family:var(--mono); font-size:11px; letter-spacing:.25em; text-transform:uppercase; color:var(--ink2); margin-bottom:12px; display:flex; align-items:center; gap:8px}
+.boxhead svg,.boxhead .lucide{width:15px;height:15px}
+.scheme{background:var(--paper2)}
+.sline{display:flex; gap:14px; align-items:flex-start; font-family:var(--mono); font-size:15px; padding:7px 0; border-bottom:1px dotted rgba(23,19,14,.25); opacity:0; animation:fadein .4s forwards}
+.sline:last-child{border-bottom:none}
+@keyframes fadein{to{opacity:1}}
+.mtag{flex:none; font-size:11px; font-weight:600; border:1.5px solid var(--ink); padding:2px 7px; border-radius:20px; background:var(--paper); letter-spacing:.05em; margin-top:1px}
+.mtag.a{background:var(--red); border-color:var(--red); color:var(--paper2)}
+.sline .tickdraw{margin-left:auto; flex:none}
+.tips{background:var(--hi); border-color:rgba(23,19,14,.5)}
+.tips ul{list-style:none; display:flex; flex-direction:column; gap:9px; font-size:17px}
+.tips li{display:flex; gap:10px; line-height:1.5}
+.tips li svg,.tips li .lucide{width:16px; height:16px; flex:none; margin-top:4px}
+.trap{border:1.5px dashed var(--red); background:rgba(184,29,44,.05)}
+.trap p{font-size:17px; line-height:1.55}
+.trap .boxhead{color:var(--red)}
+.alt{font-style:italic; font-size:16.5px; color:var(--blue); border-left:3px solid var(--blue); padding:6px 0 6px 16px; margin:12px 0 2px; line-height:1.55}
+
+/* ============ COVER ============ */
+.cover{max-width:900px; margin:0 auto; position:relative; background:linear-gradient(100deg,var(--paper2),var(--paper) 65%);
+  box-shadow:0 30px 70px rgba(0,0,0,.5), 0 3px 10px rgba(0,0,0,.4); padding:60px 58px 56px 88px; overflow:hidden}
+.cover::before{content:''; position:absolute; top:0; bottom:0; left:52px; width:1.5px; background:var(--margin); opacity:.65}
+.cover::after{content:''; position:absolute; inset:0; pointer-events:none; opacity:.35; mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.55' numOctaves='2'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23p)' opacity='.16'/%3E%3C/svg%3E");}
+.boardline{font-family:var(--mono); font-size:11.5px; letter-spacing:.3em; text-transform:uppercase; color:var(--pencil); display:flex; justify-content:space-between; gap:16px; border-bottom:1.5px solid var(--ink); padding-bottom:12px; flex-wrap:wrap}
+.masthead{font-family:var(--disp); font-weight:900; font-size:clamp(46px,8.5vw,92px); line-height:.95; letter-spacing:-.02em; margin:26px 0 6px; transform:rotate(-.6deg)}
+.masthead .deg{font-size:.42em; vertical-align:.9em; color:var(--red)}
+.masthead em{font-style:normal; position:relative; white-space:nowrap}
+.masthead em::after{content:''; position:absolute; left:-4px; right:-4px; bottom:6px; height:14px; background:var(--hi); z-index:-1; transform:skew(-8deg) rotate(-1deg)}
+.submast{font-size:19px; font-style:italic; color:var(--ink2); margin-bottom:28px; max-width:600px; line-height:1.5}
+.covergrid{display:grid; grid-template-columns:1.15fr .85fr; gap:34px; margin-top:8px}
+.coverbox{border:1.5px solid var(--ink); padding:20px 22px; background:rgba(253,249,238,.55)}
+.coverbox h3{font-family:var(--mono); font-size:11.5px; letter-spacing:.24em; text-transform:uppercase; margin-bottom:14px; display:flex; gap:9px; align-items:center; color:var(--ink2)}
+.coverbox h3 .lucide{width:15px;height:15px}
+.coverbox ul{list-style:none; display:flex; flex-direction:column; gap:8px; font-size:16px; line-height:1.45}
+.coverbox li{display:flex; gap:9px}
+.coverbox li::before{content:'—'; color:var(--red); font-weight:700}
+.statrow{display:flex; gap:0; border:2px solid var(--ink); margin:30px 0 0}
+.statcell{flex:1; padding:14px 10px; text-align:center; border-right:1.5px solid var(--ink)}
+.statcell:last-child{border-right:none}
+.statcell b{display:block; font-family:var(--disp); font-size:30px; font-weight:900; line-height:1}
+.statcell span{font-family:var(--mono); font-size:10.5px; letter-spacing:.18em; text-transform:uppercase; color:var(--pencil)}
+.startrow{display:flex; gap:16px; margin-top:34px; align-items:center; flex-wrap:wrap}
+.startrow .btn{font-size:15px; padding:17px 30px}
+.coverfoot{font-family:var(--hand); font-size:23px; color:var(--red); transform:rotate(-1.4deg); margin-top:26px}
+.candrow{display:flex; gap:16px; margin-top:26px; flex-wrap:wrap}
+.cand{flex:1; min-width:150px}
+.cand label{font-family:var(--mono); font-size:10.5px; letter-spacing:.2em; text-transform:uppercase; color:var(--pencil); display:block; margin-bottom:6px}
+.cand input{width:100%; border:none; border-bottom:2px solid var(--ink); background:transparent; font-family:var(--hand); font-size:26px; padding:2px 6px; outline:none; color:var(--blue)}
+.cand input:focus{border-color:var(--red)}
+
+/* ============ ORGANISER DRAWER ============ */
+.drawer{position:fixed; top:0; right:0; bottom:0; width:min(460px,92vw); z-index:300; background:var(--paper2);
+  box-shadow:-24px 0 60px rgba(0,0,0,.5); transform:translateX(105%); transition:transform .38s cubic-bezier(.2,.85,.25,1);
+  padding:28px 30px 60px; overflow-y:auto; border-left:3px solid var(--ink)}
+.drawer.open{transform:none}
+.drawer .x{position:sticky; top:0; float:right}
+.drawer h2{font-family:var(--disp); font-weight:900; font-size:30px; margin:6px 0 4px; letter-spacing:-.01em}
+.drawer .dsub{font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:.22em; color:var(--pencil); margin-bottom:20px}
+.fbox{border:1.5px solid var(--ink); background:var(--paper); padding:14px 16px; margin-bottom:12px; border-radius:2px}
+.fbox .fx{font-family:var(--mono); font-size:16.5px; font-weight:600; margin-bottom:5px}
+.fbox .fx .hl{background:var(--hi); padding:0 5px}
+.fbox p{font-size:15.5px; color:var(--ink2); line-height:1.5}
+.fbox.def .fx{color:var(--blue)}
+.dsect{font-family:var(--mono); font-size:11px; letter-spacing:.26em; text-transform:uppercase; color:var(--red); margin:22px 0 10px; border-bottom:1px solid var(--red); padding-bottom:6px}
+.scrim{position:fixed; inset:0; z-index:250; background:rgba(10,13,10,.55); opacity:0; pointer-events:none; transition:.3s}
+.scrim.on{opacity:1; pointer-events:auto}
+
+/* ============ MARGIN RAIL ============ */
+.rail{position:fixed; left:14px; top:50%; transform:translateY(-50%); z-index:150; display:flex; flex-direction:column; gap:7px}
+.rdot{width:30px; height:30px; border-radius:50%; border:1.5px solid rgba(246,241,228,.5); color:var(--paper);
+  font-family:var(--mono); font-size:11px; display:grid; place-items:center; background:rgba(20,26,22,.7); transition:.15s; position:relative}
+.rdot:hover{border-color:var(--paper)}
+.rdot.cur{outline:2px solid var(--paper); outline-offset:2px; font-weight:600}
+.rdot.good{border-color:#7bd99a; color:#7bd99a}
+.rdot.part{border-color:#e8c56a; color:#e8c56a}
+.rdot.bad{border-color:#ff8f96; color:#ff8f96}
+.rdot .tip{position:absolute; left:40px; top:50%; transform:translateY(-50%); white-space:nowrap; font-size:11px; letter-spacing:.08em;
+  background:var(--paper2); color:var(--ink); padding:4px 10px; border:1.5px solid var(--ink); opacity:0; pointer-events:none; transition:.15s; text-transform:uppercase; font-family:var(--mono)}
+.rdot:hover .tip{opacity:1}
+
+/* ============ RESULTS ============ */
+.results .mhead{text-align:center; border-bottom:3px double var(--ink); padding-bottom:18px; margin-bottom:22px}
+.results .mhead .r1{font-family:var(--mono); font-size:11px; letter-spacing:.3em; text-transform:uppercase; color:var(--pencil)}
+.results .mhead h1{font-family:var(--disp); font-weight:900; font-size:clamp(34px,5.5vw,52px); letter-spacing:-.01em; margin:8px 0 2px}
+.results .mhead .r2{font-style:italic; color:var(--ink2); font-size:17px}
+.gradewrap{display:flex; gap:26px; align-items:center; justify-content:center; flex-wrap:wrap; margin:26px 0}
+.gstamp{border:5px double var(--red); border-radius:8px; color:var(--red); font-family:var(--disp); font-weight:900;
+  padding:16px 30px; font-size:34px; transform:rotate(-5deg); text-align:center; animation:stampin .4s .15s both; line-height:1.05; background:rgba(253,249,238,.7)}
+.gstamp small{display:block; font-family:var(--mono); font-weight:600; font-size:12px; letter-spacing:.14em; margin-top:6px}
+.bigscore{font-family:var(--disp); font-weight:900; font-size:56px; line-height:1; text-align:center}
+.bigscore small{display:block; font-family:var(--mono); font-weight:400; font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--pencil); margin-top:8px}
+.mstable{width:100%; border-collapse:collapse; font-family:var(--mono); font-size:13.5px; margin:18px 0}
+.mstable th{border-bottom:2px solid var(--ink); text-align:left; padding:8px 10px; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--pencil)}
+.mstable td{border-bottom:1px dotted rgba(23,19,14,.3); padding:8px 10px}
+.mstable td.n{text-align:right}
+.mstable tr.wrongrow td{background:rgba(184,29,44,.05)}
+.tpi{height:8px; background:rgba(23,19,14,.12); position:relative; min-width:110px; border-radius:4px; overflow:hidden}
+.tpi i{position:absolute; inset:0; right:auto; background:var(--ink); border-radius:4px}
+.tpi.low i{background:var(--red)}
+.lostlist{list-style:none; display:flex; flex-direction:column; gap:9px; font-size:16.5px}
+.lostlist li{display:flex; gap:10px; line-height:1.5}
+.lostlist li::before{content:'✗'; color:var(--red); font-weight:700; font-family:var(--mono)}
+.results .actions{justify-content:center; margin-top:30px}
+.notebox{border:1.5px solid var(--ink); background:var(--hi); padding:14px 18px; font-size:15px; font-style:italic; margin-top:18px; line-height:1.5}
+
+.tickdraw path{stroke-dasharray:22; stroke-dashoffset:22; animation:tk .4s forwards}
+@keyframes tk{to{stroke-dashoffset:0}}
+
+/* footer strip */
+.strip{font-family:var(--mono); font-size:10.5px; letter-spacing:.24em; text-transform:uppercase; color:var(--pencil); text-align:center; margin-top:44px; border-top:1px dotted rgba(23,19,14,.35); padding-top:12px}
+
+/* ============ RESPONSIVE / MOTION / PRINT ============ */
+@media (max-width:1060px){ .rail{display:none} }
+@media (max-width:720px){
+  .sheet,.cover{padding:38px 22px 44px 40px}
+  .sheet::before,.cover::before{left:28px}
+  .punch{display:none}
+  .covergrid{grid-template-columns:1fr}
+  .qhead{gap:10px} .qno{font-size:16px}
+  body{font-size:17px}
+  .ansin{width:110px}
+  .topbar{flex-wrap:wrap; gap:8px; padding:10px 12px}
+  .brand span{display:none}
+}
+@media (prefers-reduced-motion:reduce){ *{animation-duration:.01ms!important; transition-duration:.01ms!important} }
+@media print{
+  body{background:#fff}
+  .topbar,.rail,.drawer,.scrim,.actions,.work,.padtools,#screen-cover,#screen-exam,body::after{display:none!important}
+  .deskwrap{padding:0}
+  .sheet,.cover{box-shadow:none; max-width:100%}
+}
+</style>
+<link rel="stylesheet" href="../../../assets/activity.css">
+</head>
+<body>
+
+<!-- ================= TOP BAR ================= -->
+<header class="topbar" id="topbar" hidden>
+  <div class="brand"><span class="pieglyph"></span><span>PIE/360° · Higher Statistics · Section 02</span></div>
+  <span class="chip" id="qposChip">Q 1 / 17</span>
+  <div class="spacer"></div>
+  <span class="chip"><i data-lucide="pen-line"></i><b id="markChip">0 / 45</b></span>
+  <span class="chip"><i data-lucide="timer"></i><b id="timerChip">00:00</b></span>
+  <button class="chip" id="formBtn"><i data-lucide="radical"></i>Formulae</button>
+  <button class="chip red" id="handBtn"><i data-lucide="flag"></i>Hand in</button>
+</header>
+
+<!-- ================= QUESTION RAIL ================= -->
+<nav class="rail" id="rail" hidden></nav>
+
+<!-- ================= COVER SCREEN ================= -->
+<main class="deskwrap" id="screen-cover">
+  <div class="cover">
+    <span class="punch" style="top:80px"></span><span class="punch" style="bottom:80px"></span>
+    <div class="boardline"><span>AQA-STYLE · GCSE MATHEMATICS 8300 · HIGHER TIER</span><span>PRACTICE BOOKLET · SET 02</span></div>
+    <h1 class="masthead">PIE<br>CHARTS<span class="deg">°</span><br><em>REVERS&nbsp;ENGINEERED</em></h1>
+    <p class="submast">A full skills paper built backwards from one real Higher question — every way the examiner can test “the angle tells you the count”.</p>
+
+    <div class="candrow">
+      <div class="cand"><label>Candidate surname</label><input id="candName" value="" placeholder="—" autocomplete="off"></div>
+      <div class="cand"><label>Candidate number</label><input id="candNo" value="" readonly></div>
+    </div>
+
+    <div class="covergrid">
+      <div class="coverbox">
+        <h3><i data-lucide="scroll-text"></i>Instructions</h3>
+        <ul>
+          <li>Answer <b>all</b> questions in the spaces provided.</li>
+          <li>Show full working — method marks (M1) are awarded even when the final number slips.</li>
+          <li>Diagrams are drawn accurately. Pie charts always are: that is the whole point of them.</li>
+          <li>Use the scribble pad for rough work. Cross through anything you do not want marked.</li>
+          <li>Numbers are chosen to behave without a calculator. Keep fractions exact — never round early.</li>
+        </ul>
+      </div>
+      <div class="coverbox">
+        <h3><i data-lucide="square-pen"></i>Inside this paper</h3>
+        <ul>
+          <li>Angles ↔ frequencies, both directions</li>
+          <li>Tables → angles for drawing charts</li>
+          <li>Percentages, fractions &amp; complements</li>
+          <li>Ratios inside a circle</li>
+          <li>Comparing two pie charts (the Higher trap)</li>
+          <li>Construction &amp; full reconstructions</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="statrow">
+      <div class="statcell"><b id="stQ">17</b><span>Questions</span></div>
+      <div class="statcell"><b id="stM">45</b><span>Marks</span></div>
+      <div class="statcell"><b id="stT">56</b><span>Minutes</span></div>
+      <div class="statcell"><b>4–9</b><span>Grades</span></div>
+    </div>
+
+    <div class="startrow">
+      <button class="btn red" id="startBtn"><i data-lucide="book-open"></i>Open the booklet</button>
+      <button class="btn ghost" id="orgBtn"><i data-lucide="radical"></i>Knowledge organiser</button>
+    </div>
+    <p class="coverfoot">Do not open this booklet until told to do so… good luck.</p>
+  </div>
+</main>
+
+<!-- ================= EXAM SCREEN ================= -->
+<main class="deskwrap" id="screen-exam" hidden>
+  <div id="sheetHost"></div>
+</main>
+
+<!-- ================= RESULTS SCREEN ================= -->
+<main class="deskwrap results" id="screen-results" hidden>
+  <div id="resHost"></div>
+</main>
+
+<!-- ================= ORGANISER DRAWER ================= -->
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer">
+  <button class="btn ghost x" id="drX">Close</button>
+  <h2>Knowledge organiser</h2>
+  <div class="dsub">Pie charts · the complete toolbox · learn this before starting</div>
+  <div class="dsect">The five formulas</div>
+  <div class="fbox"><div class="fx">whole chart = <span class="hl">360° = the total</span></div><p>Every angle in the chart must add back to 360°. Use this to find any hidden angle.</p></div>
+  <div class="fbox"><div class="fx">degrees per item = <span class="hl">360 ÷ total</span></div><p>The exchange rate of the chart. Find this first — almost every question starts here.</p></div>
+  <div class="fbox"><div class="fx">angle = frequency × <span class="hl">360 ÷ total</span></div><p>Use when you have a frequency table and need to draw or check the chart.</p></div>
+  <div class="fbox"><div class="fx">frequency = <span class="hl">angle ÷ 360</span> × total</div><p>Use when the chart is printed and a count is wanted. Fraction of the circle × the total.</p></div>
+  <div class="fbox"><div class="fx">1% = <span class="hl">3.6°</span> · fraction = angle/360</div><p>p% occupies 3.6p degrees. Angle a° is the fraction a⁄360 — simplify it if asked.</p></div>
+  <div class="dsect">Definitions</div>
+  <div class="fbox def"><div class="fx">sector</div><p>A “slice” of the circle, bounded by two radii and an arc. Each category gets one.</p></div>
+  <div class="fbox def"><div class="fx">angle at the centre</div><p>The degrees the sector occupies. Proportional to the frequency it represents.</p></div>
+  <div class="fbox def"><div class="fx">frequency</div><p>How many items are in a category — a count of people, matches, cars…</p></div>
+  <div class="fbox def"><div class="fx">categorical data</div><p>Data in groups, not numbers: transport, sport, pet. Pie charts show it beautifully.</p></div>
+  <div class="dsect">Golden rules for the exam hall</div>
+  <div class="fbox"><div class="fx">CHECK: <span class="hl">all angles sum to 360°</span></div><p>Your instant error-catcher. If they don’t, one step is wrong — find it before moving on.</p></div>
+  <div class="fbox"><div class="fx">Never compare raw angles <span class="hl">between two charts</span></div><p>Different totals mean the same angle is a different count. Convert both to numbers first. This is the classic Higher-tier trap.</p></div>
+  <div class="fbox"><div class="fx">Keep it exact — <span class="hl">no early rounding</span></div><p>Carry fractions like 1∕6 of a match per degree. Round only the final answer, if at all.</p></div>
+  <div class="fbox"><div class="fx">Drawing: <span class="hl">up from 12 o’clock, clockwise</span></div><p>Measure each angle from the vertical (or from the previous boundary), label each sector as you go.</p></div>
+  <div class="strip">PIE/360° · SET 02 · HIGHER TIER</div>
+</aside>
+
+<script>
+/* =========================================================
+   PIE/360° — Higher tier pie-chart practice engine
+   ========================================================= */
+(function(){
+'use strict';
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const ri=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{const x=[...a];for(let i=x.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[x[i],x[j]]=[x[j],x[i]];}return x;};
+const gcd=(a,b)=>b?gcd(b,a%b):a;
+const simp=(n,d)=>{const g=gcd(Math.abs(n),Math.abs(d));return[n/g,d/g];};
+const fracStr=(n,d)=>{const[a,b]=simp(n,d);return a+'/'+b;};
+const D2R=Math.PI/180;
+function icons(){ if(window.lucide) lucide.createIcons(); }
+
+/* ---------- answer parsing ---------- */
+function parseAns(s){
+  if(s==null)return null;
+  s=String(s).trim().toLowerCase().replace(/\s+/g,'').replace(/[,£$]/g,'').replace(/°/g,'').replace(/%$/,'');
+  if(!s)return null;
+  if(/^[-+]?\d+(\.\d+)?\/\d+$/.test(s)){const[a,b]=s.split('/').map(Number);return b===0?null:a/b;}
+  if(/^[-+]?\d+(\.\d+)?$/.test(s))return Number(s);
+  return null;
+}
+const close=(v,e,tol)=>v!=null && Math.abs(v-e)<=(tol==null?0.011:tol);
+
+/* =========================================================
+   PIE SVG RENDERER
+   ========================================================= */
+function pieSVG(sectors, opts={}){
+  const r=opts.r||96, pad=52, C=r+pad, S=2*C;
+  const pt=(a,rad)=>[C+rad*Math.sin(a*D2R), C-rad*Math.cos(a*D2R)];
+  let acc=0, out=`<svg class="pie ${opts.cls||''}" viewBox="0 0 ${S} ${S}" role="img" aria-label="pie chart">`;
+  // fills under
+  sectors.forEach(s=>{
+    const a0=acc,a1=acc+s.angle,laf=s.angle>180.001?1:0,[x0,y0]=pt(a0,r),[x1,y1]=pt(a1,r);
+    if(s.hi) out+=`<path d="M ${C} ${C} L ${x0.toFixed(2)} ${y0.toFixed(2)} A ${r} ${r} 0 ${laf} 1 ${x1.toFixed(2)} ${y1.toFixed(2)} Z" fill="rgba(255,222,64,.42)"/>`;
+    else if(s.tint) out+=`<path d="M ${C} ${C} L ${x0.toFixed(2)} ${y0.toFixed(2)} A ${r} ${r} 0 ${laf} 1 ${x1.toFixed(2)} ${y1.toFixed(2)} Z" fill="${s.tint}"/>`;
+    acc=a1;
+  });
+  out+=`<circle cx="${C}" cy="${C}" r="${r}" fill="none" stroke="var(--ink)" stroke-width="2.2"/>`;
+  acc=0;
+  sectors.forEach(s=>{
+    const a0=acc,a1=acc+s.angle,mid=(a0+a1)/2;
+    const [bx,by]=pt(a0,r);
+    out+=`<line x1="${C}" y1="${C}" x2="${bx.toFixed(2)}" y2="${by.toFixed(2)}" stroke="var(--ink)" stroke-width="1.7"/>`;
+    // angle annotation
+    if(s.show!=null){
+      const rr=Math.min(46, Math.max(30, r*s.angle/280));
+      const [ax0,ay0]=pt(a0,rr),[ax1,ay1]=pt(a1,rr),laf2=s.angle>180?1:0;
+      out+=`<path d="M ${ax0.toFixed(2)} ${ay0.toFixed(2)} A ${rr} ${rr} 0 ${laf2} 1 ${ax1.toFixed(2)} ${ay1.toFixed(2)}" fill="none" stroke="var(--ink)" stroke-width="1.2" opacity=".85"/>`;
+      const tr=s.show=='?'? (rr>38? rr-2: 30) : (s.angle<30? rr+34: rr+20);
+      const [tx,ty]=pt(mid,tr);
+      out+=`<text x="${tx.toFixed(2)}" y="${(ty+5).toFixed(2)}" text-anchor="middle" class="${s.show=='?'?'qn':'an'}">${s.show=='?'?'?':s.show}</text>`;
+    }
+    // outside label
+    if(s.name){
+      const [lx0,ly0]=pt(mid,r),[lx1,ly1]=pt(mid,r+9),[tx,ty]=pt(mid,r+26);
+      const sv=Math.sin(mid*D2R);
+      const anchor= sv>0.22?'start':(sv<-0.22?'end':'middle');
+      out+=`<line x1="${lx0.toFixed(2)}" y1="${ly0.toFixed(2)}" x2="${lx1.toFixed(2)}" y2="${ly1.toFixed(2)}" stroke="var(--ink)" stroke-width="1.1"/>`;
+      out+=`<text x="${tx.toFixed(2)}" y="${(ty+4).toFixed(2)}" text-anchor="${anchor}" class="lb">${s.name}</text>`;
+    }
+    acc=a1;
+  });
+  const [ex,ey]=pt(0,r);
+  out+=`<line x1="${C}" y1="${C}" x2="${ex}" y2="${ey}" stroke="var(--ink)" stroke-width="1.7"/>`;
+  out+='</svg>';
+  return out;
+}
+function tableHTML(cols, rows, total){
+  let h='<table class="gtable"><thead><tr>'+cols.map(c=>`<th>${c}</th>`).join('')+'</tr></thead><tbody>';
+  rows.forEach(r=>h+='<tr>'+r.map(c=>`<td>${c}</td>`).join('')+'</tr>');
+  if(total) h+='<tr class="total"><td>Total</td>'+total.map(c=>`<td>${c}</td>`).join('')+'</tr>';
+  return h+'</tbody></table>';
+}
+
+/* =========================================================
+   QUESTION TEMPLATES  (reverse-engineered from the source Q)
+   ========================================================= */
+const T=[]; const add=(id,topic,make)=>T.push({id,topic,make});
+
+/* ---- contexts ---- */
+const TRANSPORT=[['Walk','walk'],['Bus','take the bus'],['Bike','cycle'],['Car','come by car']];
+const SPORT=[['Football','chose football'],['Cricket','chose cricket'],['Tennis','chose tennis'],['Netball','chose netball']];
+const PETS=[['Dog','own a dog'],['Cat','own a cat'],['Fish','own fish'],['Other','own another pet']];
+
+/* ---------- Q type: degrees per item ---------- */
+add('peritem','Degrees per item',()=>{
+  const n=pick([45,60,72,90,120,180,360]); const per=360/n;
+  return {topic:'Degrees per item', body:`A pie chart is drawn to show the results of a survey of <b>${n} people</b>.`,
+    parts:[{ask:'How many <b>degrees</b> represent one person on the chart?',exp:per,disp:per+'°',unit:'°',marks:1}],
+    scheme:[{t:'M1',x:`The whole chart is 360° and it must represent all ${n} people: 360 ÷ ${n}.`},{t:'A1',x:`= ${per}° per person.`}],
+    tips:[`This “exchange rate” (360 ÷ total) unlocks nearly every pie-chart question — write it down first.`,`Sanity check: per-degree × total must give back 360. Here ${per} × ${n} = 360 ✓.`,'Angle and frequency are <b>directly proportional</b> — that single fact is the entire topic.'],
+    trap:`Dividing the wrong way round (${n} ÷ 360) gives degrees-per-person upside-down. Check the unit: degrees per person must get bigger as the group gets smaller.`};
+});
+
+/* ---------- mode by eye ---------- */
+add('mode','Reading the mode',()=>{
+  const cats=shuffle([['Football','cricket'],['Cricket','netball'],['Tennis','hockey'],['Netball','rounders']]).map(x=>x[0]).slice(0,4);
+  const per=pick([4,5,6,9]); const units=[pick([7,8,9]),pick([5,6]),pick([3,4])];
+  let used=units.reduce((a,b)=>a+b,0); const bigU=360/per-used; units.push(bigU); // largest = last
+  const sectors=units.map((u,i)=>({name:cats[i],angle:u*per}));
+  const correct=cats[3];
+  const opts2=shuffle(cats.map((c,i)=>({t:c,ok:i===3})));
+  const okIdx=opts2.findIndex(o=>o.ok);
+  return {topic:'Reading the mode', body:`The pie chart shows the favourite sports of a group of students.`,
+    fig:pieSVG(sectors.map(s=>({...s,show:null})),{}),
+    parts:[{ask:'Which sport is the <b>mode</b>?',type:'choice',options:opts2,exp:okIdx,disp:correct,marks:1}],
+    scheme:[{t:'M1',x:`No numbers needed: the mode is the most frequent category, and on a pie chart frequency shows up as area.`},{t:'A1',x:`The largest slice is <b>${correct}</b> (${units[3]*per}°), so ${correct} is the mode.`}],
+    tips:['The mode can be read off a pie chart at a glance — biggest slice wins. That is one reason pie charts exist.','If two slices look equal, the data has two modes (bimodal) — mention both.'],
+    trap:`Don’t pick the first or the neatest-looking label. Compare the slice <b>areas</b> — here ${correct} is clearly the biggest.`};
+});
+
+/* ---------- fraction of chart ---------- */
+add('frac','Fractions of the circle',()=>{
+  const a=pick([36,45,54,60,72,90,108,120,126,135,144,150,162]); const f=fracStr(a,360);
+  return {topic:'Fractions of the circle', body:`In a survey pie chart, the sector for <b>“${pick(['cricket','cycling','reading','gaming','swimming'])}”</b> has an angle of <b>${a}°</b>.`,
+    parts:[{ask:'What <b>fraction</b> of the whole group chose it? Give your answer in its <b>simplest form</b>.',exp:a/360,disp:f+`  ( = ${(a/360).toFixed(2).replace(/0+$/,'').replace(/\.$/,'')})`,marks:2,tol:0.0015}],
+    scheme:[{t:'M1',x:`A sector is the fraction angle ⁄ whole circle = ${a}⁄360.`},{t:'A1',x:`Simplify: divide top and bottom by ${gcd(a,360)} → <b>${f}</b>.`}],
+    tips:['Fraction, decimal and percentage are the same number in different clothes: a⁄360 → simplify → convert if asked.','Dividing by the highest common factor in one go beats simplifying twice.'],
+    trap:`Writing ${a}⁄360 and stopping — “simplest form” means the final mark (A1) only lands when it is fully cancelled down.`};
+});
+
+/* ---------- direct count ---------- */
+add('direct','From angle to count',()=>{
+  const sets=[[TRANSPORT,240],[SPORT,120],[PETS,90],[TRANSPORT,180],[SPORT,360]];
+  const [pool,tot]=pick(sets); const per=360/tot;
+  const counts=['',0]; let names,units;
+  names=pool.map(x=>x[0]); units=[ri(6,12),ri(4,9),ri(3,7)]; units.push(tot-units[0]-units[1]-units[2]);
+  const sectors=units.map((u,i)=>({name:names[i],angle:u*per,show:u*per+'°'}));
+  const qi=ri(0,3), ans=units[qi];
+  return {topic:'From angle to count',
+    body:`The pie chart shows how the <b>${tot} students</b> in a year group ${pool===TRANSPORT?'travel to school':pool===SPORT?'voted for their favourite sport':'answered a survey about pets'}.`,
+    fig:pieSVG(sectors.map((s,i)=>({...s,hi:i===qi})),{}),
+    parts:[{ask:`How many students ${pool[qi][1]}?`,exp:ans,disp:ans,unit:'students',marks:2}],
+    scheme:[{t:'M1',x:`${names[qi]} occupies ${units[qi]*per}° of 360°, so its share is ${units[qi]*per}⁄360 of the ${tot} students.`},{t:'A1',x:`${units[qi]*per}⁄360 × ${tot} = <b>${ans} students</b>.`}],
+    tips:[`Shortcut: find what one degree is worth first — ${tot} ÷ 360 = ${+(tot/360).toFixed(2)} students per degree... then multiply by the angle.`,`Estimate first! The slice looks like roughly ${Math.round(units[qi]*per/36)*10}% of the pie, so your answer should be near ${Math.round(tot*units[qi]*per/360/5)*5}. Estimation catches slips.`],
+    trap:`Multiplying angle × total (instead of angle ÷ 360 × total) gives a number bigger than the whole group — impossible answers mean the fraction went the wrong way up.`};
+});
+
+/* ---------- lucky 360 ---------- */
+add('lucky','When the total is 360',()=>{
+  const a1=pick([96,105,114,124,132,138,146]), a2=pick([58,64,72,78,84]); const a3=360-a1-a2;
+  return {topic:'When the total is 360',
+    body:`A pie chart represents <b>360 cars</b> passing a school gate. The sector angles are <b>${a1}° for cars stopping</b>, <b>${a2}° for cars slowing</b>, and the rest for cars not slowing at all.`,
+    parts:[
+      {ask:'How many cars stopped?',exp:a1,disp:a1,unit:'cars',marks:1},
+      {ask:'How many cars did not slow at all?',exp:a3,disp:a3,unit:'cars',marks:2}],
+    scheme:[{t:'M1',x:`Total = 360 and 360° represent it, so <b>1° = exactly 1 car</b>. Stopped = ${a1} cars immediately.`},{t:'M1',x:`Third angle = 360 − ${a1} − ${a2} = ${a3}°.`},{t:'A1',x:`Not slowing = <b>${a3} cars</b>. Check: ${a1} + ${a2} + ${a3} = 360 ✓`}],
+    tips:['A total of 360 is the examiner giving you a gift: angles <i>are</i> the counts. Spot it and bank the marks in seconds.','Even then, the answer to (b) needs the hidden angle first — angles at a point sum to 360°.'],
+    trap:`Don’t answer the printed ${a1}° for part (b). The third sector is unlabelled on purpose — subtract the two knowns from 360 first.`};
+});
+
+/* ---------- table -> one angle ---------- */
+add('tabangle','Table → one angle',()=>{
+  const tot=pick([24,30,36,40,45,60,72,90,120]); const per=360/tot;
+  const theme=pick([['Type of book',['Crime','Fantasy','Non-fiction','Romance']],['School lunch',['Pasta','Salad','Sandwich','Soup']],['Tree species',['Oak','Birch','Ash','Pine']]]);
+  let u; do{ u=[ri(6,12),ri(4,9),ri(3,6)]; u.push(tot-u[0]-u[1]-u[2]); }while(u[3]<2);
+  const qi=ri(0,3);
+  return {topic:'Table → one angle',
+    body:`The table shows the results of a survey of <b>${tot}</b> items. A pie chart is to be drawn.`+ tableHTML([theme[0],'Frequency'],theme[1].map((n,i)=>[n,u[i]]),[tot]),
+    parts:[{ask:`Work out the angle for <b>${theme[1][qi]}</b>.`,exp:u[qi]*per,disp:u[qi]*per+'°',unit:'°',marks:2}],
+    scheme:[{t:'M1',x:`One item is worth 360 ÷ ${tot} = ${per}°.`},{t:'A1',x:`${theme[1][qi]}: ${u[qi]} × ${per}° = <b>${u[qi]*per}°</b>.`}],
+    tips:['Equivalent route: frequency ÷ total × 360. Same fraction, same answer.','Keep the per-item value as a fraction if it doesn’t terminate — accuracy first.'],
+    trap:`Rounding the per-item degrees halfway through multiplies the error by the frequency. Keep ${per === Math.round(per) ? per+'° exact':'it exact'} until the very end.`};
+});
+
+/* ---------- percent pair ---------- */
+add('pct','Percent ↔ angle',()=>{
+  const p=pick([12.5,15,17.5,22.5,27.5,32.5,35,37.5,42.5,48,55,62.5]); const pDisp=String(p).replace('.5','½');
+  const a=pick([54,81,90,99,117,126,135,153]); const ansB=a/3.6;
+  return {topic:'Percent ↔ angle',
+    body:`A pie chart shows how a class spends its lesson time.`,
+    parts:[
+      {ask:`(a) &nbsp;${pDisp}% of the lesson is practical work.<br><span class="small">What angle is the practical-work sector?</span>`,exp:p*3.6,disp:(p*3.6)+'°',unit:'°',marks:1,tol:0.2},
+      {ask:`(b) &nbsp;The questions sector has an angle of <b>${a}°</b>.<br><span class="small">What percentage of the lesson is this?</span>`,exp:ansB,disp:ansB+'%',unit:'%',marks:1,tol:0.2}],
+    scheme:[{t:'M1',x:`100% of a lesson is the whole 360°, so <b>1% = 3.6°</b>. (a) ${pDisp}% × 3.6 = <b>${p*3.6}°</b>.`},{t:'M1',x:`(b) Reverse the machine: ${a}° ÷ 3.6 = <b>${ansB}%</b>.`}],
+    tips:['Memorise 1% = 3.6° and you can walk between percentages and angles freely, in both directions.','Quick check for (b): (angle ÷ 360) × 100 does the same job.'],
+    trap:`In (b) dividing by 100 instead of 3.6 (wrong direction) is the classic slip. Sense-check: ${a}° is about ${Math.round(a/36)/10} of the circle, so expect roughly ${Math.round(a/3.6)}%.`};
+});
+
+/* ---------- missing angle + count ---------- */
+add('missing','Missing angles',()=>{
+  let g=null,tries=0;
+  while(!g&&tries++<400){
+    const a1=ri(24,48)*3, a2=ri(18,36)*3, a3=ri(14,28)*3; const a4=360-a1-a2-a3;
+    if(a4<30||a4>210)continue;
+    const T4=pick([48,60,72,90,96,120,144,180,240]);
+    if((a4*T4)%360!==0)continue;
+    g={a:[a1,a2,a3,a4],T:T4,c:a4*T4/360};
+  }
+  const names=shuffle(['Red','Blue','Yellow','Green']);
+  return {topic:'Missing angles',
+    body:`The pie chart shows the favourite colours of <b>${g.T} students</b>.`,
+    fig:pieSVG([{name:names[0],angle:g.a[0],show:g.a[0]+'°'},{name:names[1],angle:g.a[1],show:g.a[1]+'°'},{name:names[2],angle:g.a[2],show:g.a[2]+'°'},{name:names[3],angle:g.a[3],show:'?',hi:true}],{}),
+    parts:[
+      {ask:'(a) &nbsp;Work out the size of the missing angle.',exp:g.a[3],disp:g.a[3]+'°',unit:'°',marks:1},
+      {ask:`(b) &nbsp;Work out how many students chose <b>${names[3]}</b>.`,exp:g.c,disp:g.c,unit:'students',marks:2}],
+    scheme:[{t:'M1',x:`Angles at the centre of a pie chart sum to 360°: 360 − ${g.a[0]} − ${g.a[1]} − ${g.a[2]} = <b>${g.a[3]}°</b>.`},{t:'M1',x:`${names[3]}'s share = ${g.a[3]}⁄360 of ${g.T}.`},{t:'A1',x:`${g.a[3]}⁄360 × ${g.T} = <b>${g.c} students</b>.`}],
+    tips:['“Angles at a point sum to 360°” is the geometry reason the missing angle appears — quote it mentally whenever a slice is blank.',`Order of operations matters: find ALL missing angles before touching frequencies.`],
+    trap:`Guessing the missing angle from the picture (“looks like about ${g.a[3]}°”) earns nothing — it must be calculated. Diagrams tempt; arithmetic pays.`};
+});
+
+/* ---------- REVERSE (homage to the attached question) ---------- */
+add('reverse','Rebuilding the total',()=>{
+  // brute-force clean pool, plus the exact homage set
+  const pool=[{a:132,b:48,w:30,team:'Oakfield Rovers'}];
+  for(let a=36;a<=168;a+=6)for(let b=24;b<=96;b+=6){
+    const M=360-a-b; if(M<72||M>240)continue; if(a===M||b===M)continue;
+    for(let w=10;w<=60;w+=2){
+      if((w*360)%M!==0)continue; const Tt=w*360/M; if(Tt<40||Tt>600)continue;
+      if((a*w)%M===0){ pool.push({a,b,w,team:pick(['Ridgeway Rovers','Castle FC','Brookside United','Harbour Athletic','Milltown City'])}); break; }
+    }
+  }
+  const c=pick(pool); const M=360-c.a-c.b, Tt=c.w*360/M, lost=c.a*c.w/M, drew=Tt-c.w-lost;
+  return {topic:'Rebuilding the total',
+    body:`The pie chart represents the results of matches played by <b>${c.team}</b>.`,
+    fig:pieSVG([{name:'Won',angle:M,show:null},{name:'Lost',angle:c.a,show:c.a+'°',hi:true},{name:'Drew',angle:c.b,show:c.b+'°'}],{}),
+    body2:`<b>${c.w} matches were WON.</b>`,
+    parts:[{ask:'How many matches were <b>lost</b>?',exp:lost,disp:lost,unit:'matches',marks:3}],
+    scheme:[
+      {t:'M1',x:`The Won angle is not printed — find it: 360 − ${c.a} − ${c.b} = <b>${M}°</b>.`},
+      {t:'M1',x:`${M}° represents ${c.w} matches, so the whole chart (360°) is ${c.w} × 360⁄${M} = <b>${Tt} matches</b>.`},
+      {t:'A1',x:`Lost = ${c.a}⁄360 × ${Tt} = <b>${lost} matches</b>. Check: ${c.w} + ${lost} + ${drew} = ${Tt} ✓`}],
+    tips:[
+      `Won <i>looks</i> like half the pie — but “looks like” earns nothing. Prove it with 360 − ${c.a} − ${c.b} = ${M}°, then you may use it.`,
+      'Two valid routes: (1) rebuild the total, then take the lost fraction; (2) scale directly: lost = won × (lost angle ÷ won angle). Pick whichever keeps numbers friendly.',
+      `End-check everything: all three counts should sum to ${Tt} and all three angles to 360°.`,
+      'Write every line. This is 3 marks because there are three moves: hidden angle → scale → answer.'],
+    alt:`Alternative (one-line, expert style): Lost = ${c.w} × ${c.a}⁄${M} = ${c.w} × ${+(c.a/M).toFixed(4).replace(/0+$/,'').replace(/\.$/,'')} = ${lost}. Same weights, fewer words.`,
+    trap:`${Tt} is the <b>total</b>, not the answer — many scripts stop there and throw away the final A1. Also: dividing ${c.w} by 360 is meaningless; degrees must be converted through the fraction first.`};
+});
+
+/* ---------- link two sectors ---------- */
+add('link','Linking two sectors',()=>{
+  let g=null,t=0;
+  while(!g&&t++<800){
+    const f1=pick([8,9,10,12,14,15,16,18,20,21,24,27,28,30,32,36]);
+    const a1=pick([36,42,48,54,60,66,72,78,84,90,96,108,120,126,132,144]);
+    const a2=pick([30,36,42,48,54,60,66,72,78,84,90,96,102]);
+    if(a1===a2)continue; const f2=f1*a2/a1;
+    if(!Number.isInteger(f2)||f2===f1||f2<5||f2>80)continue;
+    g={f1,a1,a2,f2};
+  }
+  const pair=pick([['choose French','study German'],['listed “history”','chose art'],['picked skiing','picked cycling'],['voted yes','voted no']]);
+  return {topic:'Linking two sectors',
+    body:`In a school survey pie chart, <b>${g.f1} students ${pair[0]}</b> and that sector has an angle of <b>${g.a1}°</b>.<br>The sector for students who ${pair[1]} has an angle of <b>${g.a2}°</b>.`,
+    parts:[{ask:`How many students ${pair[1]}?`,exp:g.f2,disp:g.f2,unit:'students',marks:2}],
+    scheme:[
+      {t:'M1',x:`${g.a1}° ↔ ${g.f1} students, so one degree carries ${g.f1} ÷ ${g.a1} = ${fracStr(g.f1,g.a1)} of a student (keep it as a fraction).`},
+      {t:'A1',x:`${g.a2}° × ${fracStr(g.f1,g.a1)} = <b>${g.f2} students</b>.`}],
+    tips:['No total needed when two sectors are linked — students-per-degree is the bridge.',`Expert one-liner: ${g.f2} = ${g.f1} × ${g.a2}⁄${g.a1}. Scale factor, done.`],
+    trap:`Rounding ${g.f1} ÷ ${g.a1} to a decimal before multiplying plants an error you cannot see. Fractions stay exact; decimals leak marks.`};
+});
+
+/* ---------- complements ---------- */
+add('complement','Complements',()=>{
+  let g=null,t=0;
+  while(!g&&t++<400){
+    const a=pick([36,42,45,48,54,60,66,72,84,90,96,108,120,126,132,135,144,150,156,162]);
+    const T4=pick([120,160,180,200,240,300,360,480,600,720]);
+    const not=(360-a)/360*T4;
+    if(!Number.isInteger(not))continue;
+    g={a,T:T4,not,f:fracStr(360-a,360)};
+  }
+  const item=pick(['chess','drama','coding','rowing','choir']);
+  return {topic:'Complements',
+    body:`In a pie chart of <b>${g.T} students</b>, the sector for “${item} club” has an angle of <b>${g.a}°</b>.`,
+    parts:[
+      {ask:`(a) &nbsp;What fraction of the students do <b>not</b> go to ${item} club?<br><span class="small">Give your answer in its simplest form.</span>`,exp:(360-g.a)/360,disp:g.f,marks:2,tol:0.0015},
+      {ask:`(b) &nbsp;How many students is that?`,exp:g.not,disp:g.not,unit:'students',marks:1}],
+    scheme:[
+      {t:'M1',x:`“Not ${item}” is everything else: angle = 360 − ${g.a} = ${360-g.a}°.`},
+      {t:'A1',x:`Fraction = ${360-g.a}⁄360 = <b>${g.f}</b>.`},
+      {t:'A1',x:`(b) ${g.f} × ${g.T} = <b>${g.not} students</b>.`}],
+    tips:['The complement trick (360 − given) turns hard questions into 2-line ones. Both parts here hang off that single subtraction.','Read the negation twice before answering: “do NOT”, “did NOT win”, “other than” all signal the complement.'],
+    trap:`Answering for the ${item} sector itself (${g.a}⁄360) shows you read “not” — and still wrote the wrong sector. Underline the “not” when you read the question.`};
+});
+
+/* ---------- ratios ---------- */
+add('ratio','Ratios in a circle',()=>{
+  let g=null,t=0;
+  while(!g&&t++<600){
+    const det=pick([24,30,36,40,48,54,60,66,72,78,84,90,96,102,108,120,132,144,150]);
+    const rem=360-det; if(rem<60)continue;
+    const prs=[[1,2],[2,3],[3,4],[1,3],[4,5],[2,5],[3,5],[5,7],[1,4]];
+    for(const[r,s]of shuffle(prs)){ if(rem%(r+s)!==0)continue;
+      g={det,r,s,rem,second:rem*r/(r+s),third:rem*s/(r+s)}; break; }
+  }
+  return {topic:'Ratios in a circle',
+    body:`The pie chart shows types of house on a street. The <b>detached</b> sector has an angle of <b>${g.det}°</b>.<br>The angles for <b>semi-detached : terraced</b> are in the ratio <b>${g.r} : ${g.s}</b>.`,
+    fig:pieSVG([{name:'Detached',angle:g.det,show:g.det+'°'},{name:'Semi-detached',angle:g.second,show:'?',hi:true},{name:'Terraced',angle:g.third,show:'?'}],{}),
+    parts:[
+      {ask:'(a) &nbsp;Angle for semi-detached',exp:g.second,disp:g.second+'°',unit:'°',marks:1},
+      {ask:'(b) &nbsp;Angle for terraced',exp:g.third,disp:g.third+'°',unit:'°',marks:2}],
+    scheme:[
+      {t:'M1',x:`The remaining angle is 360 − ${g.det} = ${g.rem}°.`},
+      {t:'M1',x:`${g.r} : ${g.s} has ${g.r+g.s} equal parts; each part is ${g.rem} ÷ ${g.r+g.s} = ${g.rem/(g.r+g.s)}°.`},
+      {t:'A1',x:`Semi-detached = ${g.r} × ${g.rem/(g.r+g.s)} = <b>${g.second}°</b>; &nbsp;terraced = ${g.s} × ${g.rem/(g.r+g.s)} = <b>${g.third}°</b>. Check: ${g.det} + ${g.second} + ${g.third} = 360 ✓`}],
+    tips:['Add the ratio numbers first — that sum is your divisor. Same skill as sharing money in a ratio, now in degrees.',`Final self-check is free marks insurance: the three angles must rebuild 360°.`],
+    trap:`Dividing the whole 360° by ${g.r+g.s} instead of the remaining ${g.rem}° — the detached sector must be removed <b>before</b> sharing.`};
+});
+
+/* ---------- same slice, same count? ---------- */
+add('concept','Same slice, same count?',()=>{
+  let g=null,t=0;
+  while(!g&&t++<500){
+    const TP=pick([120,150,160,180,200,240,300]); const TQ=pick([150,180,200,240,300,360,420]);
+    if(TP===TQ)continue;
+    const a=pick([30,36,45,60,72,90,108,120]);
+    const cP=a/360*TP, cQ=a/360*TQ;
+    if(!Number.isInteger(cP)||!Number.isInteger(cQ))continue;
+    g={TP,TQ,a,cP,cQ,diff:Math.abs(cQ-cP),big: cQ>cP?'College Q':'College P'};
+  }
+  const wrong1=`The same number chose science at both colleges.`;
+  const wrong2=`You cannot compare the two colleges without each survey total.`;
+  const corr=`${g.big} has ${g.diff} more science students.`;
+  const opts3=shuffle([{t:wrong1,ok:false},{t:wrong2,ok:false},{t:corr,ok:true}]);
+  const okIdx=opts3.findIndex(o=>o.ok);
+  return {topic:'Same slice, same count?',
+    body:`Two colleges each made a pie chart of students’ favourite subject. In <b>both</b> charts the <b>science</b> sector is exactly <b>${g.a}°</b>.<br><span class="small">College P surveyed <b>${g.TP}</b> students. College Q surveyed <b>${g.TQ}</b> students.</span>`,
+    parts:[{ask:'Select the true statement.',type:'choice',options:opts3,exp:okIdx,disp:corr,marks:2}],
+    scheme:[
+      {t:'M1',x:`Convert each chart separately. P: ${g.a}⁄360 × ${g.TP} = ${g.cP} students. Q: ${g.a}⁄360 × ${g.TQ} = ${g.cQ} students.`},
+      {t:'A1',x:`${g.cP} ≠ ${g.cQ} — the same angle only means the same <b>proportion</b>. Correct statement: “${corr}”`}],
+    tips:['An angle is a percentage in disguise. Same angle = same proportion, never the same number (unless the totals match).','When two charts appear side by side, your first written line should be each chart’s total.'],
+    trap:`Optical trick: identical-looking slices shout “same!” — but one chart is ${g.TP} people deep and the other ${g.TQ}. Proportions compare; counts need calculating.`};
+});
+
+/* ---------- comparing two charts ---------- */
+add('compare','Comparing two charts',()=>{
+  // build dramatic pair: bigger angle in A but bigger count in B
+  let g=null,t=0;
+  const cats={};
+  for(const T4 of [120,144,150,160,180,200,240,288,300,360]) for(let a=30;a<=200;a+=6){
+    const c=a*T4/360; if(Number.isInteger(c)&&c>=12&&c<=150) (cats[T4]=cats[T4]||[]).push({a,c});
+  }
+  while(!g&&t++<2000){
+    const T1=pick(Object.keys(cats).map(Number)), T2=pick(Object.keys(cats).map(Number));
+    if(T1===T2)continue; const s1=pick(cats[T1]), s2=pick(cats[T2]);
+    if(s1.a<=s2.a||s1.c>=s2.c)continue; if(Math.abs(s2.c-s1.c)<4)continue;
+    g={T1,T2,s1,s2};
+  }
+  if(!g){ g={T1:160,T2:120,s1:{a:108,c:48},s2:{a:126,c:42}}; }
+  const club=pick(['chess','cross-country','debating','astronomy','robotics']);
+  const diff=g.s2.c-g.s1.c;
+  return {topic:'Comparing two charts',
+    body:`The pie charts show clubs attended in two schools.<br>School X: <b>${g.T1} students</b>. School Y: <b>${g.T2} students</b>.`,
+    fig:`<div class="figbox">${pieSVG([{name:club,angle:g.s1.a,show:g.s1.a+'°',hi:true},{name:'Other clubs',angle:360-g.s1.a,show:null,tint:'rgba(23,19,14,.06)'}],{cls:'smallpie'})}<div class="figcap">School X · ${g.T1} students</div></div>
+         <div class="figbox">${pieSVG([{name:club,angle:g.s2.a,show:g.s2.a+'°',hi:true},{name:'Other clubs',angle:360-g.s2.a,show:null,tint:'rgba(23,19,14,.06)'}],{cls:'smallpie'})}<div class="figcap">School Y · ${g.T2} students</div></div>`,
+    parts:[{ask:`Amara says: “The ${club} angle is smaller for School Y (${g.s2.a}° &lt; ${g.s1.a}°), so School Y must have <b>fewer</b> ${club} members.”<br><span class="small">Calculate how many <b>more</b> members School Y actually has.</span>`,exp:diff,disp:diff,unit:'members',marks:3}],
+    scheme:[
+      {t:'M1',x:`School X: ${g.s1.a}⁄360 × ${g.T1} = ${g.s1.c} members.`},
+      {t:'M1',x:`School Y: ${g.s2.a}⁄360 × ${g.T2} = ${g.s2.c} members.`},
+      {t:'A1',x:`${g.s2.c} − ${g.s1.c} = <b>${diff} more members in School Y</b> — Amara is wrong.`}],
+    tips:['This is THE Higher-tier trap question. Angles only compare <b>within</b> one chart. Between charts: convert both, then compare counts.',`A smaller angle paired with a bigger total can still win — proportion × population is what counts.`],
+    trap:`Award-of-nothing move: writing “Y is smaller because ${g.s2.a}° &lt; ${g.s1.a}°”. Without using both totals (${g.T1} and ${g.T2}), zero method marks are available.`};
+});
+
+/* ---------- construct a sector (interactive) ---------- */
+add('construct','Construct the sector',()=>{
+  const tot=pick([24,30,36,40,45,60,72]); const per=360/tot;
+  const theme=pick([['After-school club',['Drama','Music','Sport']],['Weekend activity',['Homework','Sport','Gaming']],['Favourite season',['Spring','Summer','Autumn']]]);
+  const u=[ri(6,11),ri(4,8)]; u.push(tot-u[0]-u[1]); const qi=0; const theta=u[qi]*per;
+  return {topic:'Construct the sector',
+    body:`The table shows how <b>${tot} students</b> answered a survey. A pie chart is being drawn — the boundary for <b>${theme[1][0]}</b> must be measured from the vertical line, <b>clockwise</b>.`+ tableHTML([theme[0],'Frequency'],theme[1].map((n,i)=>[n,u[i]]),[tot]),
+    draw:{theta, label:theme[1][0], per, tot},
+    parts:[{ask:`Drag the dotted radius (or type the angle) to draw <b>${theme[1][0]}</b>.`,type:'angle',exp:theta,disp:theta+'°',unit:'°',marks:4}],
+    scheme:[
+      {t:'M1',x:`One student = 360 ÷ ${tot} = ${per}°.`},
+      {t:'M1',x:`${theme[1][0]}: ${u[qi]} × ${per}° = <b>${theta}°</b>.`},
+      {t:'A1',x:`Measured clockwise from the vertical: within ±1.5° full accuracy marks, tolerance bands beyond that (see your result).`},
+      {t:'A1',x:`Remaining slices: ${theme[1][1]} = ${u[1]*per}°, ${theme[1][2]} = ${u[2]*per}° — sum ${u[0]*per+u[1]*per+u[2]*per} = 360° ✓`}],
+    tips:['In the real exam: sharp pencil, protractor’s zero exactly on the vertical line, measure clockwise, label the slice immediately.',`Compute the angle BEFORE touching the protractor — drawing is the last step, not the first.`],
+    trap:`Reading the protractor’s wrong scale (inside vs outside numbers) draws ${360-theta}°. Check the slice <i>looks</i> like ${(theta/3.6).toFixed(0)}% of the circle before moving on.`};
+});
+
+/* ---------- all angles ---------- */
+add('allangles','The full set of angles',()=>{
+  const tot=pick([24,30,36,40,45,60,72,90,120]); const per=360/tot;
+  const theme=pick([['Destination',['Spain','France','Italy','Portugal']],['Pet',['Dog','Cat','Rabbit','Other']],['Genre',['Action','Comedy','Drama','Sci-fi']]]);
+  let u; do{ u=[ri(7,12),ri(5,9),ri(3,7)]; u.push(tot-u[0]-u[1]-u[2]); }while(u[3]<2);
+  const mk=n=>({ask:`Angle for <b>${n}</b>`,exp:u[theme[1].indexOf(n)]*per,disp:u[theme[1].indexOf(n)]*per+'°',unit:'°',marks:1});
+  return {topic:'The full set of angles',
+    body:`<b>${tot} people</b> were surveyed. <b>Draw a pie chart:</b> first work out the angle for each category.`+ tableHTML([theme[0],'Frequency'],theme[1].map((n,i)=>[n,u[i]]),[tot]),
+    parts:theme[1].map(n=>mk(n)),
+    scheme:[
+      {t:'M1',x:`One person = 360 ÷ ${tot} = ${per}°.`},
+      {t:'M1',x:`Multiply each frequency: ${u.map(x=>`${x} × ${per}`).join(', ')}.`},
+      {t:'A1',x:`Angles: ${theme[1].map((n,i)=>`${n} ${u[i]*per}°`).join(' · ')}.`},
+      {t:'A1',x:`Sum check: ${u.map(x=>x*per).join(' + ')} = 360° — now safe to draw with a protractor.`}],
+    tips:['The sum-check is your free accuracy mark: four angles that don’t total 360° contain an error — find it, don’t draw it.','Work in a column: freq → ×per → angle. Layout prevents slips.'],
+    trap:`Losing the last accuracy mark by drawing angles that were never checked. In “draw a pie chart” questions, marks hide in the <b>calculation</b> rows, not the artwork.`};
+});
+
+/* ---------- grand reconstruction ---------- */
+add('grand','Grand reconstruction',()=>{
+  let g=null,t=0;
+  while(!g&&t++<800){
+    const T4=pick([90,120,144,180,240,288,360]); const a=pick([60,66,72,84,90,96,102,108,120,126,132,144,150,156]);
+    const cntA=a*T4/360; if(!Number.isInteger(cntA))continue;
+    const rem=T4-cntA; if(rem<=0)continue;
+    const prs=[[2,1],[1,2],[2,3],[3,2],[1,3],[3,1],[4,3],[3,4],[2,5],[5,2],[4,1],[1,4]];
+    for(const[r,s]of shuffle(prs)){ if(rem%(r+s)!==0)continue;
+      const c2=rem*r/(r+s), c3=rem*s/(r+s);
+      const a2=c2*360/T4, a3=c3*360/T4;
+      if(!Number.isInteger(a2)||!Number.isInteger(a3))continue;
+      if(a2<=20||a3<=20)continue;
+      g={T:T4,a,cntA,rem,r,s,c2,c3,a2,a3}; break; }
+  }
+  const n1=pick([['Popcorn','Nachos','Drinks'],['Hot dogs','Burgers','Chips']]);
+  return {topic:'Grand reconstruction',
+    body:`<b>${g.T} customers</b> at a cinema kiosk were asked what they bought.<br>The <b>${n1[0]}</b> sector has an angle of <b>${g.a}°</b>.<br>The numbers buying <b>${n1[1]} : ${n1[2]}</b> were in the ratio <b>${g.r} : ${g.s}</b>.`,
+    fig:pieSVG([{name:n1[0],angle:g.a,show:g.a+'°'},{name:n1[1],angle:g.a2,show:'?'},{name:n1[2],angle:g.a3,show:'?'}],{}),
+    parts:[
+      {ask:`(a) &nbsp;How many bought ${n1[0].toLowerCase()}?`,exp:g.cntA,disp:g.cntA,unit:'customers',marks:1},
+      {ask:`(b) &nbsp;How many bought ${n1[1].toLowerCase()}?`,exp:g.c2,disp:g.c2,unit:'customers',marks:2},
+      {ask:`(c) &nbsp;How many bought ${n1[2].toLowerCase()}?`,exp:g.c3,disp:g.c3,unit:'customers',marks:1},
+      {ask:`(d) &nbsp;Angle of the ${n1[2].toLowerCase()} sector?`,exp:g.a3,disp:g.a3+'°',unit:'°',marks:1}],
+    scheme:[
+      {t:'M1',x:`${n1[0]}: ${g.a}⁄360 × ${g.T} = <b>${g.cntA} customers</b>.`},
+      {t:'M1',x:`Remaining customers: ${g.T} − ${g.cntA} = ${g.rem}.`},
+      {t:'M1',x:`Split ${g.rem} in the ratio ${g.r} : ${g.s} (${g.r+g.s} parts of ${g.rem/(g.r+g.s)}): ${n1[1]} = <b>${g.c2}</b>, ${n1[2]} = <b>${g.c3}</b>.`},
+      {t:'A1',x:`Degrees per customer: 360 ÷ ${g.T} = ${360/g.T}°. ${n1[2]} angle = ${g.c3} × ${360/g.T} = <b>${g.a3}°</b>.`},
+      {t:'A1',x:`Final audit: counts ${g.cntA}+${g.c2}+${g.c3} = ${g.T}; angles ${g.a}+${g.a2}+${g.a3} = 360 ✓`}],
+    tips:['Untangle compound questions by harvesting one fact at a time: angle → count → remainder → ratio share → back to angle.','This single question is the whole topic compressed — if you can flow through it, the real paper holds no fear.','Keep a running tally in the margin of every number you prove.'],
+    trap:`Applying the ratio to all ${g.T} customers instead of the remaining ${g.rem} — the ${n1[0].toLowerCase()} buyers must leave before the split. One subtraction early saves three marks late.`};
+});
+
+/* =========================================================
+   APP STATE
+   ========================================================= */
+const state={qs:[], i:0, st:[], t0:0, timer:null, resit:false, name:'Anon', cand:''};
+function buildPaper(templates){
+  state.qs=templates.map(t=>({...t.make(), tid:t.id}));
+  state.i=0; state.resit=!!templates.length && templates[0]!==T[0];
+  state.st=state.qs.map(()=>({checked:false,award:0,given:[],hinted:false,scrib:null,theta:null}));
+}
+const qTotal=q=>q.parts.reduce((s,p)=>s+p.marks,0);
+const paperTotal=()=>state.qs.reduce((s,q)=>s+qTotal(q),0);
+const earned=()=>state.st.reduce((s,x)=>s+x.award,0);
+
+/* =========================================================
+   SCREENS
+   ========================================================= */
+function show(id){ ['#screen-cover','#screen-exam','#screen-results'].forEach(s=>$(s).hidden=s!==id); window.scrollTo({top:0}); }
+function fmtTime(ms){ const s=Math.floor(ms/1000); return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); }
+function startTimer(){ clearInterval(state.timer); state.t0=Date.now();
+  state.timer=setInterval(()=>{$('#timerChip').textContent=fmtTime(Date.now()-state.t0);},1000); }
+
+/* =========================================================
+   EXAM RENDERING
+   ========================================================= */
+function tickSVG(col){ return `<svg class="tickdraw" width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 12.5 L10 18 L20 6" stroke="${col||'var(--green)'}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`; }
+function crossSVG(){ return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="tk"><path d="M5 5 L19 19 M19 5 L5 19" stroke="var(--red)" stroke-width="3" stroke-linecap="round"/></svg>`; }
+
+function renderRail(){
+  const rail=$('#rail'); rail.innerHTML='';
+  state.qs.forEach((q,i)=>{
+    const st=state.st[i];
+    const b=document.createElement('button');
+    b.className='rdot'+(i===state.i?' cur':'')+(st.checked?(st.award===qTotal(q)?' good':(st.award>0?' part':' bad')):'');
+    b.innerHTML=(i+1)+`<span class="tip">${q.topic}</span>`;
+    b.onclick=()=>goQuestion(i);
+    rail.appendChild(b);
+  });
+}
+function goQuestion(i,skipAnim){
+  saveScribble();
+  const sheet=$('.sheet');
+  const swap=()=>{ state.i=i; paintQuestion(); const s2=$('.sheet'); s2.classList.add('arriving'); setTimeout(()=>s2.classList.remove('arriving'),500);
+    $('#qposChip').textContent=`Q ${i+1} / ${state.qs.length}`; renderRail(); window.scrollTo({top:0,behavior:'smooth'}); };
+  if(skipAnim||!sheet){ swap(); return; }
+  sheet.classList.add('turning'); setTimeout(()=>{ swap(); },240);
+}
+
+function paintQuestion(){
+  const q=state.qs[state.i], st=state.st[state.i];
+  const host=$('#sheetHost');
+  const marks=qTotal(q);
+  const answered=st.checked;
+  host.innerHTML=`
+  <article class="sheet">
+    <span class="punch" style="top:80px"></span><span class="punch" style="bottom:80px"></span>
+    <div class="qhead">
+      <span class="qno">${state.i+1}.</span>
+      <span class="qtopic">${q.topic} · Higher</span>
+      <span class="qmarks">[ ${marks} mark${marks>1?'s':''} ]<span class="awa" id="awa"></span></span>
+    </div>
+    <p class="qbody">${q.body}</p>
+    ${q.fig?`<div class="figure">${q.fig}</div>`:''}
+    ${q.body2?`<p class="qbody" style="margin:16px 0 4px; letter-spacing:.02em">${q.body2}</p>`:''}
+    <div id="drawHost"></div>
+    <div id="partsHost">
+      ${q.parts.map((p,pi)=> p.type==='angle'
+        ? `<div class="part"><div class="pask">${p.ask} <span class="permark">(${p.marks} marks — tolerance bands below)</span></div>
+            <div class="ansrow" style="justify-content:flex-end"><span class="pm_earned" data-earn="${pi}"></span></div></div>`
+        : p.type==='choice'
+        ? `<div class="part"><div class="pask">${p.ask} <span class="permark">(${p.marks})</span></div>
+            <div class="opts" data-pi="${pi}">${p.options.map((o,oi)=>`<label class="opt" data-oi="${oi}"><input type="radio" name="q${state.i}p${pi}" value="${oi}"><span class="olet">${'ABC'[oi]}</span><span>${o.t}</span></label>`).join('')}</div>
+            <div class="ansrow" style="justify-content:flex-end"><span class="pm_earned" data-earn="${pi}"></span></div></div>`
+        : `<div class="part"><div class="pask">${p.ask.startsWith('(')?'':''}${p.ask}</div>
+            <div class="ansrow">
+              <span class="alab">Answer</span><span class="ansruled"></span>
+              <input class="ansin" data-pi="${pi}" inputmode="text" autocomplete="off" spellcheck="false" aria-label="answer">
+              ${p.unit?`<span class="unit">${p.unit}</span>`:''}
+              <span class="permark">(${p.marks})</span><span class="pm_earned" data-earn="${pi}"></span>
+            </div></div>`).join('')}
+    </div>
+    <div class="worklabel"><i data-lucide="pencil" style="width:13px;height:13px"></i>Working space · show every step · rough work is crossed out, never erased<i data-lucide="ruler" style="width:13px;height:13px"></i></div>
+    <div class="work" id="work">
+      <canvas id="pad"></canvas>
+      <div class="padtools">
+        <button class="padt on" data-tool="pen" title="pencil"><i data-lucide="pencil"></i></button>
+        <button class="padt" data-tool="erase" title="eraser"><i data-lucide="eraser"></i></button>
+        <button class="padt" data-tool="clear" title="clear"><i data-lucide="trash-2"></i></button>
+      </div>
+      <div class="workghost" id="ghost" hidden></div>
+    </div>
+    <div class="actions" id="actRow">
+      <button class="btn red" id="checkBtn"><i data-lucide="check"></i>Mark my answer</button>
+      <button class="btn ghost" id="hintBtn"><i data-lucide="lightbulb"></i>Nudge (−1 mark)</button>
+    </div>
+    <div id="fb"></div>
+    <div class="strip">Question ${state.i+1} of ${state.qs.length} · total for this question ${marks} mark${marks>1?'s':''} · PIE/360° · GO ON TO THE NEXT QUESTION</div>
+  </article>`;
+  icons();
+  if(st.checked) $('#awa').textContent='+'+st.award;
+
+  // choice wiring
+  $$('.opt',host).forEach(o=>o.addEventListener('click',()=>{
+    if(st.checked)return;
+    $$('.opt',o.parentElement).forEach(x=>x.classList.remove('picked')); o.classList.add('picked');
+  }));
+  // numeric enter
+  $$('.ansin',host).forEach(inp=>inp.addEventListener('keydown',e=>{ if(e.key==='Enter'){e.preventDefault(); doCheck();} }));
+
+  initPad();
+  restoreScribble();
+  if(q.draw) initDraw(q,st);
+
+  $('#checkBtn').onclick=doCheck;
+  $('#hintBtn').onclick=()=>{ if(st.checked)return;
+    if(!st.hinted){ st.hinted=true; const g=$('#ghost'); g.hidden=false; g.textContent='Start here: '+q.scheme[0].x.replace(/<[^>]+>/g,''); $('#hintBtn').style.opacity=.4; } };
+  if(answered) showMarked(false); // repaint saved state
+}
+
+/* ---------- collect & grade ---------- */
+function collect(q){
+  return q.parts.map((p,pi)=>{
+    if(p.type==='choice'){ const sel=$(`.opts[data-pi="${pi}"] input:checked`,$('#sheetHost')); return sel?Number(sel.value):null; }
+    if(p.type==='angle'){ const inp=$(`.drawangle`); return parseAns(inp?inp.value:null); }
+    const inp=$(`.ansin[data-pi="${pi}"]`,$('#sheetHost')); return parseAns(inp.value);
+  });
+}
+function grade(q,vals){
+  let award=0; const per=[];
+  q.parts.forEach((p,pi)=>{
+    if(p.type==='choice'){ const ok=vals[pi]===p.exp; per.push({ok,marks:ok?p.marks:0,got:opts3text(p,vals[pi])}); if(ok)award+=p.marks; }
+    else if(p.type==='angle'){
+      const th=vals[pi]; let m=0;
+      if(th!=null){ const d=angDiff(th,p.exp); m=d<=1.5?4:d<=3?3:d<=5?2:d<=8?1:0; }
+      per.push({ok:m===p.marks,marks:m,got:th==null?'—':(Math.round(th*10)/10)+'°',drawn:true,diff:th==null?null:angDiff(th,p.exp)});
+      award+=m;
+    } else { const ok=close(vals[pi],p.exp,p.tol); per.push({ok,marks:ok?p.marks:0,got:vals[pi]==null?'—':rawGot(pi,vals[pi])}); if(ok)award+=p.marks; }
+  });
+  return {award,per};
+}
+function rawGot(pi,v){ const el=$(`.ansin[data-pi="${pi}"]`,$('#sheetHost')); return el?el.value:v; }
+function opts3text(p,vi){ return vi==null?'—':('ABC'[vi]); }
+const angDiff=(a,b)=>{let d=Math.abs(a-b);return d>180?360-d:d;};
+
+function doCheck(){
+  const q=state.qs[state.i], st=state.st[state.i];
+  if(st.checked){ return; }
+  const vals=collect(q);
+  st.given=vals;
+  let {award,per}=grade(q,vals);
+  if(st.hinted) award=Math.min(award,Math.max(0,qTotal(q)-1));
+  st.per=per; st.award=award; st.checked=true;
+  $('#markChip').textContent=`${earned()} / ${paperTotal()}`;
+  $('#awa').textContent='+'+award;
+  showMarked(true);
+  renderRail();
+}
+function showMarked(fresh){
+  const q=state.qs[state.i], st=state.st[state.i];
+  // lock inputs & paint states
+  q.parts.forEach((p,pi)=>{
+    if(p.type==='choice'){
+      $$('.opt',$('#sheetHost')).forEach(o=>{ if(o.parentElement.dataset.pi!=pi)return; o.classList.add('locked');
+        const oi=Number(o.dataset.oi); if(oi===st.given[pi])o.querySelector('input').checked=true;
+        if(oi===p.exp)o.classList.add('right'); else if(oi===st.given[pi])o.classList.add('wrong'); });
+    } else if(p.type!=='angle'){
+      const inp=$(`.ansin[data-pi="${pi}"]`,$('#sheetHost')); inp.readOnly=true;
+      inp.value=st.given[pi]==null?'':(inp.value||inputMirror(p,st.given[pi]));
+      if(st.per[pi].ok)inp.classList.add('ok'); else inp.classList.add('bad');
+      inp.insertAdjacentHTML('afterend', st.per[pi].ok? tickSVG(): crossSVG());
+    }
+    const badge=$(`[data-earn="${pi}"]`,$('#sheetHost'));
+    badge.textContent=(st.per[pi].marks>0?'+':'')+st.per[pi].marks;
+    badge.style.color=st.per[pi].marks>0?'var(--red)':'var(--pencil)';
+  });
+  const drSvg=$('#drawSvg');
+  if(drSvg&&q.draw){
+    drSvg.style.pointerEvents='none';
+    const aIdx=q.parts.findIndex(pp=>pp.type==='angle');
+    const dIn=$('.drawangle');
+    if(dIn&&aIdx>-1){ dIn.readOnly=true; dIn.classList.add(st.per[aIdx].ok?'ok':'bad');
+      dIn.insertAdjacentHTML('afterend', st.per[aIdx].ok? tickSVG(): crossSVG()); }
+    const rE=104, CE=104+54, exp=q.draw.theta;
+    const ex=CE+rE*Math.sin(exp*D2R), ey=CE-rE*Math.cos(exp*D2R);
+    const tx=CE+0.72*rE*Math.sin((exp+10)*D2R), ty=CE-0.72*rE*Math.cos((exp+10)*D2R);
+    if(!$('#expectLine')) drSvg.insertAdjacentHTML('beforeend',
+      `<line id="expectLine" x1="${CE}" y1="${CE}" x2="${ex.toFixed(1)}" y2="${ey.toFixed(1)}" stroke="var(--green)" stroke-width="2.6"/>
+       <text x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" style="font-family:var(--mono);font-size:13px;font-weight:600;fill:var(--green)">${exp}° correct</text>`);
+  }
+  const allBlank=q.parts.every((p,pi)=>st.given[pi]==null);
+  const full=st.award===qTotal(q);
+  const fb=$('#fb');
+  fb.innerHTML=`
+  <div class="feedback">
+    <span class="stamp ${full?'':'bad'}">${full?'CHECKED':(st.award>0?'MOSTLY':'SEE ME')}</span>
+    <div class="verdict">${full?pick(['Beautiful. Full marks.','Clean work — every mark.','Exemplar answer. Notice pinned.']):(allBlank?'Blank. In an exam, an attempt can never score less than blank.':'Not quite — here is the road in.')}
+      <small>${st.award} of ${qTotal(q)} marks ${st.hinted?'(nudge used — capped)':''} · ${q.topic.toLowerCase()}</small></div>
+    <div class="pverdicts">${q.parts.map((p,pi)=>`<div class="pv">${st.per[pi].ok?tickSVG():crossSVG()}
+      <span><b>${p.ask.replace(/<[^>]+>/g,' ').slice(0,44).trim()}…</b>&nbsp; → your answer: <span class="${st.per[pi].ok?'':'given'}">${st.per[pi].got}</span>
+      ${st.per[pi].ok?'':`&nbsp;· correct: <b style="color:var(--red)">${p.disp}</b>`}
+      ${st.per[pi].drawn?`&nbsp;· within ${st.per[pi].diff==null?'—':st.per[pi].diff.toFixed(1)}°`:''}
+      &nbsp;<span style="color:var(--pencil)">(${st.per[pi].marks}/${p.marks})</span></span></div>`).join('')}</div>
+    <div class="box scheme"><div class="boxhead"><i data-lucide="list-checks"></i>Mark scheme — exam board style</div>
+      ${q.scheme.map((s,i)=>`<div class="sline" style="animation-delay:${i*180}ms"><span class="mtag ${s.t.startsWith('A')?'a':''}">${s.t}</span><span>${s.x}</span>${tickSVG(s.t.startsWith('A')?'var(--red)':'var(--blue)')}</div>`).join('')}
+    </div>
+    ${q.alt?`<div class="alt">${q.alt}</div>`:''}
+    <div class="box tips"><div class="boxhead"><i data-lucide="highlighter"></i>Tips &amp; tricks that earn marks</div>
+      <ul>${q.tips.map(t=>`<li><i data-lucide="check"></i><span>${t}</span></li>`).join('')}</ul></div>
+    <div class="box trap"><div class="boxhead"><i data-lucide="alert-triangle"></i>The trap to avoid</div><p>${q.trap}</p></div>
+    <div class="actions">
+      ${ state.i<state.qs.length-1
+        ? `<button class="btn" id="nextBtn"><i data-lucide="corner-down-right"></i>Turn over — next question</button>`
+        : `<button class="btn red" id="nextBtn"><i data-lucide="file-check-2"></i>Finish — collect marksheet</button>` }
+    </div>
+  </div>`;
+  icons();
+  $('#actRow')?.remove();
+  $('#nextBtn').onclick=()=>{ saveScribble();
+    if(state.i<state.qs.length-1) goQuestion(state.i+1); else renderResults(); };
+  if(fresh){ setTimeout(()=>fb.scrollIntoView({behavior:'smooth',block:'start'}),350); }
+}
+function inputMirror(p,v){ return p.disp; }
+
+/* =========================================================
+   SCRIBBLE PAD
+   ========================================================= */
+let padCtx=null, padCanvas=null, padDraw=false, padTool='pen';
+function initPad(){
+  const work=$('#work'); padCanvas=$('#pad'); if(!padCanvas)return;
+  const r=work.getBoundingClientRect(); const dpr=window.devicePixelRatio||1;
+  padCanvas.width=r.width*dpr; padCanvas.height=r.height*dpr;
+  padCtx=padCanvas.getContext('2d'); padCtx.scale(dpr,dpr);
+  padCtx.lineCap='round'; padCtx.lineJoin='round';
+  let lx=0,ly=0;
+  const pos=e=>{ const b=padCanvas.getBoundingClientRect(); return [e.clientX-b.left, e.clientY-b.top]; };
+  padCanvas.addEventListener('pointerdown',e=>{ if(e.button!==0)return; padCanvas.setPointerCapture(e.pointerId); padDraw=true; [lx,ly]=pos(e); dot(lx,ly); });
+  padCanvas.addEventListener('pointermove',e=>{ if(!padDraw)return; const[x,y]=pos(e); stroke(lx,ly,x,y); lx=x;ly=y; });
+  ['pointerup','pointercancel','pointerleave'].forEach(ev=>padCanvas.addEventListener(ev,()=>padDraw=false));
+  function dot(x,y){ ctxSet(); padCtx.beginPath(); padCtx.arc(x,y,padCtx.lineWidth/2,0,7); padCtx.fillStyle=padCtx.strokeStyle; padCtx.fill(); }
+  function stroke(a,b,x,y){ ctxSet(); padCtx.beginPath(); padCtx.moveTo(a,b); padCtx.lineTo(x,y); padCtx.stroke(); }
+  function ctxSet(){ if(padTool==='erase'){ padCtx.globalCompositeOperation='destination-out'; padCtx.lineWidth=16; padCtx.strokeStyle='rgba(0,0,0,1)'; }
+    else{ padCtx.globalCompositeOperation='source-over'; padCtx.lineWidth=1.7; padCtx.strokeStyle='rgba(38,34,28,.8)'; } }
+  $$('.padt',work).forEach(b=>b.onclick=()=>{
+    const t=b.dataset.tool;
+    if(t==='clear'){ padCtx.clearRect(0,0,padCanvas.width,padCanvas.height); state.st[state.i].scrib=null; return; }
+    padTool=t; $$('.padt',work).forEach(x=>x.classList.remove('on')); b.classList.add('on');
+  });
+}
+function saveScribble(){ const st=state.st[state.i]; if(padCanvas&&st){ try{ st.scrib=padCanvas.toDataURL(); }catch(e){} } }
+function restoreScribble(){ const st=state.st[state.i]; if(st&&st.scrib&&padCtx){ const img=new Image(); img.onload=()=>{ const b=padCanvas.getBoundingClientRect(); padCtx.drawImage(img,0,0,b.width,b.height); }; img.src=st.scrib; } }
+
+/* =========================================================
+   INTERACTIVE SECTOR CONSTRUCTION
+   ========================================================= */
+function initDraw(q,st){
+  const host=$('#drawHost');
+  const r=104,pad=54,C=r+pad,S=2*C;
+  const pt=(a,rad)=>[C+rad*Math.sin(a*D2R), C-rad*Math.cos(a*D2R)];
+  let theta=st.theta==null?0:st.theta;
+  let ticks='';
+  for(let a=0;a<360;a+=10){ const[tx1,ty1]=pt(a,r),[tx2,ty2]=pt(a,r-(a%30?5:9));
+    ticks+=`<line x1="${tx1.toFixed(2)}" y1="${ty1.toFixed(2)}" x2="${tx2.toFixed(2)}" y2="${ty2.toFixed(2)}" stroke="var(--pencil)" stroke-width="${a%30?0.7:1.1}" opacity="${a%30?0.45:0.7}"/>`; }
+  for(let a=0;a<360;a+=30){ const[tx,ty]=pt(a,r+18); ticks+=`<text x="${tx.toFixed(2)}" y="${(ty+4).toFixed(2)}" text-anchor="middle" style="font-family:var(--mono);font-size:10px;fill:var(--pencil)">${a}</text>`; }
+  host.innerHTML=`
+   <div class="figure"><div class="figbox">
+   <svg id="drawSvg" viewBox="0 0 ${S} ${S}" style="width:min(360px,88vw);touch-action:none;cursor:grab">
+     ${ticks}
+     <circle cx="${C}" cy="${C}" r="${r}" fill="rgba(253,249,238,.6)" stroke="var(--ink)" stroke-width="2.2"/>
+     <g id="wedgeG"></g>
+     <line x1="${C}" y1="${C}" x2="${pt(0,r)[0]}" y2="${pt(0,r)[1]}" stroke="var(--ink)" stroke-width="2.2"/>
+     <text x="${C}" y="${C-r-30}" text-anchor="middle" style="font-family:var(--mono);font-size:11px;fill:var(--ink2);letter-spacing:.1em">0° START</text>
+     <circle cx="${C}" cy="${C}" r="3.2" fill="var(--ink)"/>
+     <g id="handG"></g>
+   </svg>
+   <div class="figcap" style="margin-top:10px; display:flex; gap:10px; justify-content:center; align-items:center">
+     <span style="font-family:var(--mono);font-size:13px">${q.draw.label} angle:</span>
+     <input class="ansin drawangle" style="width:110px" inputmode="decimal" placeholder="—">
+     <span class="unit">°</span>
+   </div>
+   <p class="qbody small" style="text-align:center;max-width:340px;margin:6px auto 0">Drag anywhere on the circle — the dotted boundary and shaded sector follow your pointer. Tolerance bands: ≤1.5° → 4 marks · ≤3° → 3 · ≤5° → 2 · ≤8° → 1.</p>
+   </div></div>`;
+  const svg=$('#drawSvg'), wedge=$('#wedgeG'), hand=$('#handG'), inp=$('.drawangle');
+  function render(){
+    const[hx,hy]=pt(theta,r),laf=theta>180?1:0,[sx,sy]=pt(0,r);
+    wedge.innerHTML= theta>0.01? `<path d="M ${C} ${C} L ${sx.toFixed(2)} ${sy.toFixed(2)} A ${r} ${r} 0 ${laf} 1 ${hx.toFixed(2)} ${hy.toFixed(2)} Z" fill="rgba(255,222,64,.34)"/>` : '';
+    hand.innerHTML=`<line x1="${C}" y1="${C}" x2="${hx.toFixed(2)}" y2="${hy.toFixed(2)}" stroke="var(--red)" stroke-width="2" stroke-dasharray="6 5"/>
+      <circle cx="${hx.toFixed(2)}" cy="${hy.toFixed(2)}" r="9" fill="rgba(184,29,44,.15)" stroke="var(--red)" stroke-width="2"/>
+      <text x="${pt(Math.min(theta+8,355),r*0.55)[0].toFixed(2)}" y="${pt(Math.min(theta+8,355),r*0.55)[1].toFixed(2)}" style="font-family:var(--mono);font-size:15px;font-weight:600;fill:var(--red)">${Math.round(theta)}°</text>`;
+    if(document.activeElement!==inp) inp.value=theta>0.01?(Math.round(theta*10)/10):'';
+    st.theta=theta;
+  }
+  let dragging=false;
+  const toTheta=e=>{ const b=svg.getBoundingClientRect(); const x=(e.clientX-b.left)/b.width*S-C, y=(e.clientY-b.top)/b.height*S-C;
+    return (Math.atan2(x,-y)*180/Math.PI+360)%360; };
+  svg.addEventListener('pointerdown',e=>{ if(st.checked)return; dragging=true; svg.setPointerCapture(e.pointerId); svg.style.cursor='grabbing'; theta=toTheta(e); render(); });
+  svg.addEventListener('pointermove',e=>{ if(!dragging)return; theta=toTheta(e); render(); });
+  ['pointerup','pointercancel'].forEach(ev=>svg.addEventListener(ev,()=>{dragging=false; svg.style.cursor='grab'; theta=Math.round(theta*2)/2; render();}));
+  svg.addEventListener('keydown',e=>{ if(st.checked)return; if(e.key==='ArrowRight'||e.key==='ArrowLeft'){ theta=(theta+(e.key==='ArrowRight'?1:-1)*(e.shiftKey?10:1)+360)%360; render(); e.preventDefault(); } });
+  svg.tabIndex=0;
+  inp.addEventListener('input',()=>{ if(st.checked)return; const v=parseAns(inp.value); if(v!=null){ theta=Math.max(0,Math.min(359.9,v)); render(); } });
+  inp.addEventListener('keydown',e=>{ if(e.key==='Enter'){e.preventDefault(); doCheck();} });
+  render();
+  if(st.checked){ inp.readOnly=true; svg.style.pointerEvents='none'; }
+}
+
+/* =========================================================
+   RESULTS / MARKSHEET
+   ========================================================= */
+const BOUNDS=[[0.78,9],[0.66,8],[0.54,7],[0.425,6],[0.34,5],[0.24,4],[0.15,3]];
+const gradeOf=p=>{ for(const[b,g]of BOUNDS) if(p>=b)return g; return 'U'; };
+function renderResults(){
+  $('#topbar').hidden=true; $('#rail').hidden=true;
+  show('#screen-results');
+  clearInterval(state.timer);
+  const total=paperTotal(), got=earned(), p=got/total, grade=gradeOf(p);
+  const mins=Math.round((Date.now()-state.t0)/60000);
+  const topics={};
+  state.qs.forEach((q,i)=>{ const t=q.topic; topics[t]=topics[t]||{max:0,got:0}; topics[t].max+=qTotal(q); topics[t].got+=state.st[i].award; });
+  const rows=Object.entries(topics).sort((a,b)=>(a[1].got/a[1].max)-(b[1].got/b[1].max));
+  const wrong=state.qs.filter((q,i)=>state.st[i].award<qTotal(q));
+  $('#resHost').innerHTML=`
+  <article class="sheet">
+    <span class="punch" style="top:80px"></span><span class="punch" style="bottom:80px"></span>
+    <div class="mhead">
+      <div class="r1">Examiner's marksheet · PIE/360° · Set 02 · Higher tier · ${state.resit?'RESIT PAPER':'FULL PAPER'}</div>
+      <h1>Moderation complete</h1>
+      <div class="r2">Candidate: <b>${state.name||'—'}</b> · № ${state.cand} · completed in ${mins} min</div>
+    </div>
+    <div class="gradewrap">
+      <div class="bigscore">${got}<span style="font-size:26px;color:var(--pencil)"> / ${total}</span><small>Raw mark · ${(p*100).toFixed(0)}%</small></div>
+      <div class="gstamp">GRADE ${grade}<small>INDICATIVE · AQA-STYLE BOUNDS</small></div>
+    </div>
+    <div class="notebox">Boundaries shift every series — this grade is modelled on typical AQA 8300 Higher proportions for a ~${total}-mark section. Treat it as a compass, not a verdict.</div>
+    <h3 style="font-family:var(--mono);font-size:11.5px;letter-spacing:.24em;text-transform:uppercase;margin:26px 0 6px;color:var(--ink2)">Question by question</h3>
+    <table class="mstable"><thead><tr><th>Q</th><th>Skill being tested</th><th class="n">Marks</th><th class="n">Awarded</th><th></th></tr></thead><tbody>
+      ${state.qs.map((q,i)=>{const st=state.st[i],full=st.award===qTotal(q);
+        return `<tr class="${full?'':'wrongrow'}"><td>${i+1}</td><td>${q.topic}</td><td class="n">${qTotal(q)}</td><td class="n" style="font-weight:600;color:${full?'var(--green)':'var(--red)'}">${st.award}</td><td>${full?'✓':(st.award>0?'~':'✗')}</td></tr>`;}).join('')}
+    </tbody></table>
+    <h3 style="font-family:var(--mono);font-size:11.5px;letter-spacing:.24em;text-transform:uppercase;margin:26px 0 10px;color:var(--ink2)">Mastery by skill</h3>
+    <table class="mstable"><tbody>
+      ${rows.map(([t,v])=>{const r=v.got/v.max;return `<tr><td style="width:42%">${t}</td><td><div class="tpi ${r<0.6?'low':''}"><i style="width:${(r*100).toFixed(0)}%"></i></div></td><td class="n">${v.got}/${v.max}</td></tr>`;}).join('')}
+    </tbody></table>
+    ${wrong.length?`<div class="box trap"><div class="boxhead"><i data-lucide="repeat-2"></i>Where the marks escaped — revisit these first</div>
+      <ul class="lostlist">${wrong.slice(0,6).map(q=>`<li><b>Q${state.qs.indexOf(q)+1} ${q.topic}:</b> ${q.trap}</li>`).join('')}</ul></div>`:''}
+    <div class="actions">
+      ${wrong.length?`<button class="btn red" id="resitBtn"><i data-lucide="repeat-2"></i>Resit weak questions (${wrong.length})</button>`:''}
+      <button class="btn" id="newBtn"><i data-lucide="dices"></i>New shuffled paper</button>
+      <button class="btn ghost" id="printBtn"><i data-lucide="printer"></i>Print marksheet</button>
+      <button class="btn ghost" id="coverBtn"><i data-lucide="home"></i>Cover</button>
+    </div>
+    <div class="strip">END OF PAPER · PIE/360° · SET 02 · HIGHER TIER · ALL ROUGH WORK SHOWN IN THIS BOOKLET</div>
+  </article>`;
+  icons();
+  const rb=$('#resitBtn'); if(rb) rb.onclick=()=>{ buildPaper(wrong.map(q=>T.find(t=>t.id===q.tid))); startExam(true); };
+  $('#newBtn').onclick=()=>{ buildPaper(T); startExam(true); };
+  $('#printBtn').onclick=()=>window.print();
+  $('#coverBtn').onclick=()=>{ show('#screen-cover'); };
+}
+
+/* =========================================================
+   FLOW
+   ========================================================= */
+function startExam(fresh){
+  show('#screen-exam'); $('#topbar').hidden=false; $('#rail').hidden=false;
+  startTimer();
+  $('#markChip').textContent=`0 / ${paperTotal()}`;
+  $('#qposChip').textContent=`Q 1 / ${state.qs.length}`;
+  goQuestion(0,true);
+}
+function handIn(){
+  const left=state.st.filter(s=>!s.checked).length;
+  const msg=left? `${left} question${left>1?'s are':' is'} still unmarked. Unmarked = zero. Hand the paper in anyway?`:`Hand in the paper and collect your marksheet?`;
+  if(confirm(msg)){ let cur=state.st[state.i]; if(!cur.checked){} saveScribble(); renderResults(); }
+}
+/* drawer */
+function openDrawer(o){ $('#drawer').classList.toggle('open',o); $('#scrim').classList.toggle('on',o); }
+
+/* =========================================================
+   BOOT
+   ========================================================= */
+function boot(){
+  buildPaper(T);
+  state.cand=String(ri(1000,9999));
+  $('#candNo').value=state.cand;
+  $('#stQ').textContent=state.qs.length; $('#stM').textContent=paperTotal(); $('#stT').textContent=Math.round(paperTotal()*1.25);
+  $('#startBtn').onclick=()=>{ state.name=$('#candName').value.trim(); buildPaper(T); startExam(true); };
+  $('#orgBtn').onclick=()=>openDrawer(true);
+  $('#formBtn').onclick=()=>openDrawer(true);
+  $('#drX').onclick=()=>openDrawer(false);
+  $('#scrim').onclick=()=>openDrawer(false);
+  $('#handBtn').onclick=handIn;
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape')openDrawer(false); });
+  icons();
+}
+document.readyState==='loading'?document.addEventListener('DOMContentLoaded',boot):boot();
+})();
+</script>
+<a id="pennine-library-return" href="index.html" aria-label="Return to the topic library">← Topic library</a>
+</body>
+</html>
