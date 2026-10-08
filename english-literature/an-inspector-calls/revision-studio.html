@@ -154,7 +154,7 @@ const state = {
   page: localStorage.getItem('aic_page') || 'dashboard',
   flashIndex: 0, flashFilter:'All', quoteFilter:'All', quoteSearch:'',
   examIndex: +(localStorage.getItem('aic_examIndex')||0), timer:null, timerSeconds:0,
-  quizIndex:0, quizScore:0, quizLocked:false,
+  quizIndex:0, quizScore:0, quizLocked:false, quizAnswer:null,
   progress: JSON.parse(localStorage.getItem('aic_progress')||'{"known":[],"missed":[],"quizBest":0,"visits":{},"streak":0,"lastDay":""}')
 };
 
@@ -257,7 +257,34 @@ function quizQuestions(){return [
  {q:'Which is the best way to use context?',opts:['Write a separate history paragraph','Link context to a dramatic method and Priestley’s purpose','List as many dates as possible','Avoid it'],a:1,e:'Context earns its value when it explains how and why Priestley constructs the play.'},
  {q:'Why can Gerald be read as especially dangerous?',opts:['He is openly foolish','He makes privilege appear charming and reasonable while still protecting hierarchy','He has no status','He completely accepts the Inspector’s lesson'],a:1,e:'A polished defender of privilege may be more persuasive than Birling’s obvious arrogance.'}
 ]}
-function bindQuiz(){const item=quizQuestions()[state.quizIndex%10];$$('[data-quiz]').forEach(b=>b.onclick=()=>{if(state.quizLocked)return;state.quizLocked=true;const n=+b.dataset.quiz;$$('[data-quiz]').forEach((x,i)=>x.classList.add(i===item.a?'correct':(i===n?'wrong':'')));if(n===item.a)state.quizScore++;$('#quizFeedback').innerHTML=`<div class="quiz-explain">${item.e}</div><button class="primary" id="nextQuiz" style="margin-top:12px">${state.quizIndex===9?'Finish quiz':'Next question'}</button>`;$('#nextQuiz').onclick=()=>{if(state.quizIndex===9){state.progress.quizBest=Math.max(state.progress.quizBest||0,state.quizScore);save();toast(`Quiz complete: ${state.quizScore}/10`);state.quizIndex=0;state.quizScore=0}else state.quizIndex++;state.quizLocked=false;render()}})}
+function bindQuiz(){
+ const questions=quizQuestions();
+ const item=questions[state.quizIndex%questions.length];
+ function showFeedback(){
+  $$('[data-quiz]').forEach((button,i)=>{
+   button.classList.toggle('correct',i===item.a);
+   button.classList.toggle('wrong',i===state.quizAnswer&&i!==item.a);
+   button.disabled=true;
+  });
+  $('#quizFeedback').innerHTML=`<div class="quiz-explain" role="status">${item.e}</div><button class="primary" id="nextQuiz" style="margin-top:12px">${state.quizIndex===questions.length-1?'Finish quiz':'Next question'}</button>`;
+  $('#nextQuiz').onclick=()=>{
+   if(state.quizIndex===questions.length-1){
+    state.progress.quizBest=Math.max(state.progress.quizBest||0,state.quizScore);
+    save();toast(`Quiz complete: ${state.quizScore}/${questions.length}`);
+    state.quizIndex=0;state.quizScore=0;
+   }else state.quizIndex++;
+   state.quizLocked=false;state.quizAnswer=null;render();
+  };
+ }
+ $$('[data-quiz]').forEach(button=>button.onclick=()=>{
+  if(state.quizLocked)return;
+  state.quizAnswer=+button.dataset.quiz;
+  state.quizLocked=true;
+  if(state.quizAnswer===item.a)state.quizScore++;
+  showFeedback();
+ });
+ if(state.quizLocked)showFeedback();
+}
 function bindConnections(){$('#checkBlurt').onclick=()=>{$('#blurtResult').innerHTML=`<div class="recall-points"><div class="recall-point"><strong>Method:</strong> body metaphor / collective pronoun.</div><div class="recall-point"><strong>Meaning:</strong> society is interdependent; harm cannot be isolated.</div><div class="recall-point"><strong>Contrast:</strong> directly opposes Birling’s individualism.</div><div class="recall-point"><strong>Context:</strong> resonates with a 1945 audience shaped by collective wartime experience.</div><div class="recall-point"><strong>Purpose:</strong> makes social responsibility feel universal, not optional.</div></div>`}}
 
 $('#modalClose').onclick=closeModal;$('#modalBackdrop').onclick=e=>{if(e.target===$('#modalBackdrop'))closeModal()};$('#menuBtn').onclick=()=>$('#sidebar').classList.toggle('open');$('#themeBtn').onclick=()=>{document.body.classList.toggle('light');localStorage.setItem('aic_theme',document.body.classList.contains('light')?'light':'dark')};$('#focusBtn').onclick=()=>document.body.classList.toggle('focus-mode');$('#resetProgressBtn').onclick=()=>{if(confirm('Reset flashcard ratings, streak and quiz best?')){state.progress={known:[],missed:[],quizBest:0,visits:{},streak:0,lastDay:''};save();updateProgressUI();toast('Progress reset')}};
